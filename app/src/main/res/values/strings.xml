@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">KeyboardApp</string>
+    <string name="accessibility_service_label">AccessibilityService</string>
+    <string name="accessibility_service_description">AccessibilityServiceDescription</string>
+    <string name="button">Button</string>
+    <string name="text">Text</string>
+</resources>
