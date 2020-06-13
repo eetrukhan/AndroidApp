@@ -55,6 +55,7 @@ public class Connection {
                 in = null;
                 out = null;
             }
+            Log.i("CLOSE CONNECTION", "Connection Closed!");
         }
     }
 
@@ -88,8 +89,8 @@ public class Connection {
             Log.i("RECIEVED DATA", "Waiting for data . . .");
             String data = in.readLine();
             Log.d("RECIEVED DATA", data);
-
             return data.split(";");
+
         } catch (Exception e) {
             e.printStackTrace();
             return null;

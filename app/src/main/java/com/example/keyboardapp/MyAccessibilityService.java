@@ -55,32 +55,31 @@ public class MyAccessibilityService extends AccessibilityService {
 
         //TODO КОСТЫЛЬ НЕ ЗНАЮ КАК ПРАВИЛЬНО ВЫКЛЮЧАТЬ ACCESSIBILITY
         if (execThread != null) {
-            while(mConnect != null)
-                stopLoop = true;
+            stopLoop = true;
         }
 
         execThread = new Thread(() ->
         {
+            try {
+                Log.i("Connection", "Search for server ...");
+                while (HOST == null)
+                    Broadcast.recieveBroadcast();
+
+                Log.i("Connection", "Connecting ...");
+                mConnect = null;
+                mConnect = new Connection(HOST, PORT);
+                mConnect.openConnection();
+                Log.i("Connection", "Server Connected!");
+
+            } catch (Exception e) {
+                Log.i("Connection", e.getMessage() == null ? "exception" : e.getMessage());
+            }
+
             while (!stopLoop) {
                 if (mConnect == null) {
                     Log.i("Accessibility", "NO CONNECTION");
-
-                    try {
-                        Log.i("Connection", "Search for server ...");
-                        while (HOST == null)
-                            Broadcast.recieveBroadcast();
-
-                        Log.i("Connection", "Connecting ...");
-                        mConnect = null;
-                        mConnect = new Connection(HOST, PORT);
-                        mConnect.openConnection();
-                        Log.i("Connection", "Server Connected!");
-
-                    } catch (Exception e) {
-                        Log.i("Connection", e.getMessage() == null ? "exception" : e.getMessage());
-                    }
-
-                    continue;
+                    stopSelf();
+                    return;
                 }
 
                 try {
