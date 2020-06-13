@@ -6,13 +6,16 @@ import android.graphics.Path;
 import android.util.Log;
 import android.view.accessibility.AccessibilityEvent;
 
-import java.text.NumberFormat;
-
 import static com.example.keyboardapp.Constants.HOST;
 import static com.example.keyboardapp.Constants.PORT;
 import static com.example.keyboardapp.Constants.TIME_CONSTANT;
 
 public class MyAccessibilityService extends AccessibilityService {
+    public static volatile Connection mConnect = null;
+    public static Thread execThread = null;
+    private volatile boolean stopLoop = false;
+
+
     @Override
     public void onAccessibilityEvent(AccessibilityEvent event) {
     }
@@ -23,9 +26,9 @@ public class MyAccessibilityService extends AccessibilityService {
     }
 
     public void drawGesture(String[] data) {
-        Log.i("Accesability", "Start Drawing . . .");
+        Log.i("Accessibility", "Start Drawing . . .");
 
-        if(data == null || data.length < 2) {
+        if (data == null || data.length < 2) {
             Log.i("Draw gesture", "Empty coords");
             return;
         }
@@ -49,26 +52,49 @@ public class MyAccessibilityService extends AccessibilityService {
     @Override
     protected void onServiceConnected() {
         super.onServiceConnected();
-        new Thread(() ->
+
+        //TODO КОСТЫЛЬ НЕ ЗНАЮ КАК ПРАВИЛЬНО ВЫКЛЮЧАТЬ ACCESSIBILITY
+        if (execThread != null) {
+            while(mConnect != null)
+                stopLoop = true;
+        }
+
+        execThread = new Thread(() ->
         {
-            while (HOST == null)
-                Broadcast.recieveBroadcast();
-            while (true) {
-                if (MainActivity.mConnect == null) {
-                    MainActivity.mConnect = new Connection(HOST, PORT);
-                    MainActivity.mConnect.openConnection();
+            while (!stopLoop) {
+                if (mConnect == null) {
+                    Log.i("Accessibility", "NO CONNECTION");
+
+                    try {
+                        Log.i("Connection", "Search for server ...");
+                        while (HOST == null)
+                            Broadcast.recieveBroadcast();
+
+                        Log.i("Connection", "Connecting ...");
+                        mConnect = null;
+                        mConnect = new Connection(HOST, PORT);
+                        mConnect.openConnection();
+                        Log.i("Connection", "Server Connected!");
+
+                    } catch (Exception e) {
+                        Log.i("Connection", e.getMessage() == null ? "exception" : e.getMessage());
+                    }
+
+                    continue;
                 }
 
-                if (MainActivity.mConnect == null)
-                    continue;
-
                 try {
-                    drawGesture(MainActivity.mConnect.receiveData());
+                    drawGesture(mConnect.receiveData());
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 }
             }
+            execThread = null;
+            mConnect.closeConnection();
+            mConnect = null;
         }
-        ).start();
+        );
+        execThread.start();
     }
+
 }

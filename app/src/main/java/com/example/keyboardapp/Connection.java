@@ -5,7 +5,6 @@ import android.util.Log;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.Socket;
 
@@ -74,7 +73,7 @@ public class Connection {
                 out.flush();
 
                 Log.i("SENT DATA", data);
-            } catch (IOException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }).start();
@@ -83,10 +82,10 @@ public class Connection {
     String[] receiveData() {
         if(in == null) {
             Log.i("RECIEVED DATA", "null stream");
-
             return null;
         }
         try {
+            Log.i("RECIEVED DATA", "Waiting for data . . .");
             String data = in.readLine();
             Log.d("RECIEVED DATA", data);
 

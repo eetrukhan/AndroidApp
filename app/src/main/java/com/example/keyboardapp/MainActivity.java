@@ -1,41 +1,29 @@
 package com.example.keyboardapp;
 
 
-import android.accessibilityservice.AccessibilityService;
 import android.app.Activity;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
-import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 
 
 import android.os.Bundle;
+import android.widget.Toast;
 
-import static com.example.keyboardapp.Constants.HOST;
-import static com.example.keyboardapp.Constants.PORT;
+import static com.example.keyboardapp.MyAccessibilityService.mConnect;
 
 public class MainActivity extends Activity {
-    public static Connection mConnect = null;
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        mConnect.closeConnection();
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Button button = findViewById(R.id.button);
-
-        new Thread(() -> {
-            while (HOST == null)
-                Broadcast.recieveBroadcast();
-            addTextEntryListener();
-        }).start();
+        addTextEntryListener();
     }
 
     void addTextEntryListener() {
@@ -54,16 +42,13 @@ public class MainActivity extends Activity {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if (mConnect == null) {
-                    new Thread(() -> {
-                        if (mConnect == null) {
-                            mConnect = new Connection(HOST, PORT);
-                            mConnect.openConnection();
-                        }
-                    }).start();
-                } else
+                if (mConnect != null)
                     mConnect.sendData(text.getText().toString() + '\0');
+                else
+                    Toast.makeText(MainActivity.this, "Turn On Accessibility Service!", Toast.LENGTH_SHORT).show();
             }
         });
     }
+
+
 }
