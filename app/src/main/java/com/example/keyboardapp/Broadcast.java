@@ -6,31 +6,57 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.InterfaceAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
+import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.List;
+import java.util.Objects;
 
-public class Broadcast {
-    private static final String LOG_TAG = "BROADCAST";
+class Broadcast {
+    private final String LOG_TAG = "Broadcast";
 
-    static void recieveBroadcast()
-    {
+    private int mPort;
+    private volatile String host = null;
+
+    private volatile boolean packetReceived = false;
+
+
+    Broadcast(int port) {
+        mPort = port;
+    }
+
+    void recieveBroadcast() {
+        packetReceived = false;
+        host = null;
+
         try {
-            DatagramSocket socket = new DatagramSocket(9876, InetAddress.getByName("0.0.0.0"));
+            DatagramSocket socket = new DatagramSocket(mPort, InetAddress.getByName("0.0.0.0"));
             socket.setBroadcast(true);
 
-            while (Constants.HOST == null) {
-                Log.i(LOG_TAG,"Ready to receive broadcast packets!");
+            Log.i(LOG_TAG, "Waiting for packets . . .");
 
-                //Receive a packet
-                byte[] recvBuf = new byte[15000];
-                DatagramPacket packet = new DatagramPacket(recvBuf, recvBuf.length);
-                socket.receive(packet);
+            byte[] recvBuf = new byte[1024];
+            DatagramPacket packet = new DatagramPacket(recvBuf, recvBuf.length);
+            socket.receive(packet);
 
-                //Packet received
-                Log.i(LOG_TAG, "Packet received from: " + packet.getAddress().getHostAddress());
-
-                Constants.HOST = packet.getAddress().getHostAddress();
-            }
-        } catch (IOException ex) {
-            Log.i(LOG_TAG, "" + ex.getMessage());
+            Log.i(LOG_TAG, "Packet received from: " + packet.getAddress().getHostAddress());
+            host = packet.getAddress().getHostAddress();
+            packetReceived = true;
         }
+        catch (IOException e)
+        {
+            Log.i(LOG_TAG, e.getMessage() == null ? "Receiving error." : e.getMessage());
+        }
+    }
+
+    boolean isPacketReceived() {
+        return packetReceived;
+    }
+
+    String getHost() {
+        return host;
     }
 }

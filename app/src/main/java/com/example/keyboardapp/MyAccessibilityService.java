@@ -6,14 +6,16 @@ import android.graphics.Path;
 import android.util.Log;
 import android.view.accessibility.AccessibilityEvent;
 
-import static com.example.keyboardapp.Constants.HOST;
-import static com.example.keyboardapp.Constants.PORT;
-import static com.example.keyboardapp.Constants.TIME_CONSTANT;
+import java.net.SocketException;
 
 public class MyAccessibilityService extends AccessibilityService {
-    public static volatile Connection mConnect = null;
-    public static Thread execThread = null;
-    private volatile boolean stopLoop = false;
+    public static volatile boolean isLooping = true;
+
+    private final int TIME_CONSTANT = 7; //коэффицент отвечающий за время отрисовки жеста
+
+    public static void DisableService() {
+        isLooping = false;
+    }
 
 
     @Override
@@ -25,11 +27,27 @@ public class MyAccessibilityService extends AccessibilityService {
 
     }
 
+    @Override
+    protected void onServiceConnected() {
+        loopReceiving();
+    }
+
+    synchronized void loopReceiving() {
+        new Thread(() ->
+        {
+            while (isLooping) {
+                if (Connection.getInstance().isConnected())
+                    drawGesture(Connection.getInstance().receiveData());
+            }
+            disableSelf();
+        }).start();
+    }
+
     public void drawGesture(String[] data) {
-        Log.i("Accessibility", "Start Drawing . . .");
+        Log.i("Accessibility", "Start Drawing ...");
 
         if (data == null || data.length < 2) {
-            Log.i("Draw gesture", "Empty coords");
+            Log.i("Accessibility", "Empty (x,y) array.");
             return;
         }
 
@@ -47,53 +65,8 @@ public class MyAccessibilityService extends AccessibilityService {
         GestureDescription.Builder gestureBuilder = new GestureDescription.Builder();
         gestureBuilder.addStroke(new GestureDescription.StrokeDescription(clickPath, 0, data.length * TIME_CONSTANT));
         dispatchGesture(gestureBuilder.build(), null, null);
-    }
 
-    @Override
-    protected void onServiceConnected() {
-        super.onServiceConnected();
-
-        //TODO КОСТЫЛЬ НЕ ЗНАЮ КАК ПРАВИЛЬНО ВЫКЛЮЧАТЬ ACCESSIBILITY
-        if (execThread != null) {
-            stopLoop = true;
-        }
-
-        execThread = new Thread(() ->
-        {
-            try {
-                Log.i("Connection", "Search for server ...");
-                while (HOST == null)
-                    Broadcast.recieveBroadcast();
-
-                Log.i("Connection", "Connecting ...");
-                mConnect = null;
-                mConnect = new Connection(HOST, PORT);
-                mConnect.openConnection();
-                Log.i("Connection", "Server Connected!");
-
-            } catch (Exception e) {
-                Log.i("Connection", e.getMessage() == null ? "exception" : e.getMessage());
-            }
-
-            while (!stopLoop) {
-                if (mConnect == null) {
-                    Log.i("Accessibility", "NO CONNECTION");
-                    stopSelf();
-                    return;
-                }
-
-                try {
-                    drawGesture(mConnect.receiveData());
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                }
-            }
-            execThread = null;
-            mConnect.closeConnection();
-            mConnect = null;
-        }
-        );
-        execThread.start();
+        Log.i("Accessibility", "Successful drawn.");
     }
 
 }
