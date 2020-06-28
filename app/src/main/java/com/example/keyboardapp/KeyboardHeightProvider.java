@@ -165,13 +165,14 @@ public class KeyboardHeightProvider extends PopupWindow {
         notifyKeyboardSizeChanged(keyboardPortraitHeight, screenSize.x);
 
         if (orientation == Configuration.ORIENTATION_PORTRAIT) {
-            if (keyboardHeight < 0)
+            if (keyboardHeight <= 0)
                 this.keyboardPortraitZero = keyboardHeight;
             else {
                 this.keyboardPortraitHeight = -keyboardPortraitZero + keyboardHeight;
                 notifyKeyboardSizeChanged(keyboardPortraitHeight, screenSize.x);
             }
         }
+
     }
 
     private int getScreenOrientation() {
