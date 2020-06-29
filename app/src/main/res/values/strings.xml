@@ -2,6 +2,8 @@
     <string name="app_name">KeyboardApp</string>
     <string name="accessibility_service_label">AccessibilityService</string>
     <string name="accessibility_service_description">AccessibilityServiceDescription</string>
-    <string name="button">Button</string>
+    <string name="button">Start Service</string>
     <string name="text">Text</string>
+    <string name="info">CLick the back button to close the keyboard, click the EditText to open it again.</string>
+    <string name="height">Keyboard height (pixels):</string>
 </resources>

@@ -1,102 +1,133 @@
 package com.example.keyboardapp;
 
+import android.app.Application;
 import android.util.Log;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.net.Socket;
 
-public class Connection {
+class Connection {
+    private final String LOG_TAG = "Connection";
+    private static Connection Instance;
+
+
     private Socket mSocket = null;
-    private String mHost = null;
-    private int mPort = 0;
-    private static BufferedReader in;
-    public static float x;
-    public static float y;
-    public static String[] data;
+    private int mPort = 1488;
+    private Broadcast broadcast = new Broadcast(9876);
 
-    public static final String LOG_TAG = "SOCKET";
+    private volatile BufferedReader in;
+    private volatile OutputStreamWriter out;
 
-    public Connection() {
-    }
+    private volatile boolean isConnected;
 
-    public Connection(final String host, final int port) {
-        this.mHost = host;
+    private volatile boolean doConnect = true;
+
+    private Connection(final int port) {
         this.mPort = port;
     }
 
-    // Метод открытия сокета
-    public void openConnection() throws Exception {
-        // Если сокет уже открыт, то он закрывается
-        closeConnection();
+    boolean isConnected() {
+        return isConnected;
+    }
+
+    void Disconnect() {
+        doConnect = false;
+    }
+
+    static Connection getInstance() {
+        if (Instance == null)
+            Instance = new Connection(1488);
+        return Instance;
+    }
+
+    void loopConnection() {
+        new Thread(() -> {
+            while (doConnect)
+                openConnection();
+            closeConnection();
+        }).start();
+    }
+
+    private void openConnection() {
+        if (isConnected)
+            return;
+
+        isConnected = false;
+
         try {
-            // Создание сокета
-            mSocket = new Socket(mHost, mPort);
+            Log.i(LOG_TAG, "Search for server ...");
+            while (!broadcast.isPacketReceived())
+                broadcast.recieveBroadcast();
+
+            Log.i(LOG_TAG, "Connecting to " + broadcast.getHost());
+            mSocket = new Socket(broadcast.getHost(), mPort);
             in = new BufferedReader(new InputStreamReader(mSocket.getInputStream()));
-            Log.d("SOCKET", "Открыт");
-        } catch (IOException e) {
-            Log.e("socket", e.getMessage());
-            throw new Exception("Невозможно создать сокет: "
-                    + e.getMessage());
+            out = new OutputStreamWriter(mSocket.getOutputStream());
+
+            Log.i(LOG_TAG, "Server Connected.");
+            isConnected = true;
+        } catch (Exception e) {
+            Log.i(LOG_TAG, e.getMessage() == null ? "Error" : e.getMessage());
         }
     }
 
-    /**
-     * Метод закрытия сокета
-     */
-    public void closeConnection() {
-        if (mSocket != null && !mSocket.isClosed()) {
-            try {
-                mSocket.close();
-            } catch (IOException e) {
-                Log.e(LOG_TAG, "Ошибка при закрытии сокета :"
-                        + e.getMessage());
-            } finally {
-                mSocket = null;
-            }
-        }
-        mSocket = null;
-    }
 
-    /**
-     * Метод отправки данных
-     */
-    public void sendData(byte[] data) throws Exception {
-        // Проверка открытия сокета
-        if (mSocket == null || mSocket.isClosed()) {
-            throw new Exception("Ошибка отправки данных. " +
-                    "Сокет не создан или закрыт");
-        }
-        // Отправка данных
+    private void closeConnection() {
+        if (!isConnected)
+            return;
+
         try {
-            mSocket.getOutputStream().write(data);
-            mSocket.getOutputStream().flush();
+            sendData("\0");
+            mSocket.close();
+            isConnected = false;
+            mSocket = null;
+            in = null;
+            out = null;
+            Instance = null;
         } catch (IOException e) {
-            throw new Exception("Ошибка отправки данных : "
-                    + e.getMessage());
+            Log.i(LOG_TAG, e.getMessage() == null ? "Connection not closed." : e.getMessage());
         }
+        Log.i(LOG_TAG, "Connection Closed.");
     }
 
-    public void receiveData() {
+    void sendData(String data) {
+        if (!isConnected)
+            return;
+
         try {
-            Log.d(Connection.LOG_TAG, "Вошли");
-            Log.d(Connection.LOG_TAG, "Читаем");
-            data = in.readLine().split(";");
-            Log.d(Connection.LOG_TAG, "Считали");
-            for (int i = 0; i < data.length; i++)
-                Log.d(Connection.LOG_TAG, data[i]);
-            Log.d(Connection.LOG_TAG, "Размер массива: "+data.length);
-            Log.d(Connection.LOG_TAG, "Вывели");
-        } catch (Exception ex) {
-            Log.d(Connection.LOG_TAG, "Упало");
+            out.write(data);
+            out.flush();
+
+            Log.i(LOG_TAG, "Sent: " + data);
+        } catch (IOException e) {
+            isConnected = false;
+            Log.i(LOG_TAG, "Can't send: " + data);
+            Log.i(LOG_TAG, e.getMessage() == null ? "Can't send: " + data : e.getMessage());
         }
-
     }
 
-    @Override
-    protected void finalize() throws Throwable {
-        super.finalize();
-        closeConnection();
+    String[] receiveData() {
+        if (!isConnected)
+            return null;
+
+        Log.i(LOG_TAG, "Waiting for gestures . . .");
+
+        try {
+            String data = in.readLine();
+
+            if (data == null)
+                throw new IOException("Disconnected from server");
+
+            Log.d(LOG_TAG, data);
+            return data.split(";");
+        } catch (IOException e) {
+            isConnected = false;
+            Log.i(LOG_TAG, e.getMessage() == null ? "Can't receive data from server." : e.getMessage());
+            return null;
+        }
     }
+
 }
