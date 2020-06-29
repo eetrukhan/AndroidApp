@@ -161,8 +161,6 @@ public class KeyboardHeightProvider extends PopupWindow {
         // ВЫЧИСЛЕНИЯ РАЗМЕРА ТУТ
         int orientation = getScreenOrientation();
         int keyboardHeight = screenSize.y - rect.bottom;
-        this.keyboardPortraitHeight = keyboardHeight;
-        notifyKeyboardSizeChanged(keyboardPortraitHeight, screenSize.x);
 
         if (keyboardHeight <= 0)
             this.keyboardPortraitZero = keyboardHeight;
