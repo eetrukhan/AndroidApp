@@ -103,15 +103,15 @@ public class MainActivity extends Activity implements KeyboardHeightObserver {
 
 
     @Override
-    public void onKeyboardSizeChanged(int height, int width) {
+    public void onKeyboardSizeChanged(int height_keyboard, int height, int width) {
         Log.i(LOG_TAG, "onKeyboardHeightChanged in pixels: " + height);
 
         TextView tv = findViewById(R.id.height_text);
-        tv.setText(String.format(Locale.ENGLISH,"%d %d",height, width));
+        tv.setText(String.format(Locale.ENGLISH,"%d %d : %d",height, width, height_keyboard));
         if(Connection.getInstance().isConnected() && !isKeyboardOpened)
         {
             new Thread(() ->Connection.getInstance()
-                    .sendData(String.format(Locale.ENGLISH,"%d %d",height, width)))
+                    .sendData(String.format(Locale.ENGLISH,"%d %d %d",height, width, height_keyboard)))
                     .start();
             isKeyboardOpened = true;
         }

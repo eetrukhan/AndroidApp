@@ -29,5 +29,5 @@ public interface KeyboardHeightObserver {
      * 
      * @param height        The height of the keyboard in pixels
      */
-    void onKeyboardSizeChanged(int height, int width);
+    void onKeyboardSizeChanged(int height_keyboard, int height, int width);
 }

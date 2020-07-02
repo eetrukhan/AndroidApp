@@ -166,7 +166,7 @@ public class KeyboardHeightProvider extends PopupWindow {
             this.keyboardPortraitZero = keyboardHeight;
         else {
             this.keyboardPortraitHeight = -keyboardPortraitZero + keyboardHeight;
-            notifyKeyboardSizeChanged(keyboardPortraitHeight, screenSize.x);
+            notifyKeyboardSizeChanged(keyboardPortraitHeight, screenSize.x, screenSize.y);
         }
 
     }
@@ -175,9 +175,9 @@ public class KeyboardHeightProvider extends PopupWindow {
         return activity.getResources().getConfiguration().orientation;
     }
 
-    private void notifyKeyboardSizeChanged(int height, int width) {
+    private void notifyKeyboardSizeChanged(int height_keyboard, int width, int height) {
         if (observer != null) {
-            observer.onKeyboardSizeChanged(height, width);
+            observer.onKeyboardSizeChanged(height_keyboard, height, width);
         }
     }
 }
