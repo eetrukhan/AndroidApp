@@ -166,7 +166,7 @@ public class KeyboardHeightProvider extends PopupWindow {
             this.keyboardPortraitZero = keyboardHeight;
         else {
             this.keyboardPortraitHeight = -keyboardPortraitZero + keyboardHeight;
-            notifyKeyboardSizeChanged(keyboardPortraitHeight, screenSize.x, screenSize.y);
+            notifyKeyboardSizeChanged(keyboardPortraitHeight, screenSize.x, screenSize.y - keyboardPortraitZero);
         }
 
     }

@@ -107,7 +107,7 @@ public class MainActivity extends Activity implements KeyboardHeightObserver {
         Log.i(LOG_TAG, "onKeyboardHeightChanged in pixels: " + height);
 
         TextView tv = findViewById(R.id.height_text);
-        tv.setText(String.format(Locale.ENGLISH,"%d %d : %d",height, width, height_keyboard));
+        tv.setText(String.format(Locale.ENGLISH,"%d %d : %d", height, width, height_keyboard));
         if(Connection.getInstance().isConnected() && !isKeyboardOpened)
         {
             new Thread(() ->Connection.getInstance()
