@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.accessibility.AccessibilityEvent;
 
 import java.net.SocketException;
+import java.util.ArrayList;
 
 public class MyAccessibilityService extends AccessibilityService {
     public static volatile boolean isLooping = true;
@@ -50,20 +51,27 @@ public class MyAccessibilityService extends AccessibilityService {
             Log.i("Accessibility", "Empty (x,y) array.");
             return;
         }
+        ArrayList<String> gestureData = new ArrayList<String>();
+        for(int i=0; i<data.length;i++)
+        {
+            data[i]=data[i].replace(",",".");
+            if(i%3==0)
+                gestureData.add(data[i]);
+        }
 
         Path clickPath = new Path();
 
         clickPath.moveTo(
-                Float.parseFloat(data[0]),
-                Float.parseFloat(data[1]));
+                Float.parseFloat(gestureData.get(0)),
+                Float.parseFloat(gestureData.get(1)));
 
-        for (int i = 2; i < data.length; i += 2) {
+        for (int i = 2; i < gestureData.size()-1; i += 2) {
             clickPath.lineTo(
-                    Float.parseFloat(data[i]),
-                    Float.parseFloat(data[i + 1]));
+                    Float.parseFloat(gestureData.get(i)),
+                    Float.parseFloat(gestureData.get(i + 1)));
         }
         GestureDescription.Builder gestureBuilder = new GestureDescription.Builder();
-        gestureBuilder.addStroke(new GestureDescription.StrokeDescription(clickPath, 0, data.length * TIME_CONSTANT));
+        gestureBuilder.addStroke(new GestureDescription.StrokeDescription(clickPath, 0, gestureData.size() * TIME_CONSTANT));
         dispatchGesture(gestureBuilder.build(), null, null);
 
         Log.i("Accessibility", "Successful drawn.");
