@@ -98,6 +98,11 @@ class Connection {
             return;
 
         try {
+
+            String[] words = data.split(" ");
+            if(words[words.length - 1].length() == 1)
+                data += ' ';
+
             out.write(data);
             out.flush();
 
