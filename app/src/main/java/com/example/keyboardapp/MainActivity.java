@@ -4,6 +4,7 @@ package com.example.keyboardapp;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.os.Debug;
 import android.provider.Settings;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -18,6 +19,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
 import java.util.Locale;
 
 
@@ -27,6 +29,8 @@ public class MainActivity extends Activity implements KeyboardHeightObserver {
     private KeyboardHeightProvider keyboardHeightProvider;
 
     private boolean isKeyboardOpened = false;
+
+    ArrayList<String> words = new ArrayList<String>();
 
     @Override
     protected void onDestroy() {
@@ -77,12 +81,17 @@ public class MainActivity extends Activity implements KeyboardHeightObserver {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if (Connection.getInstance().isConnected() && isKeyboardOpened)
-                    new Thread(() -> Connection.getInstance().sendData(text.getText().toString() + '\0')).start();
-                else
-                    Toast.makeText(MainActivity.this, "Warning. No connection with server" +
-                            " or can't determine keyboard size(reopen keyboard view for retry.).",
-                            Toast.LENGTH_SHORT).show();
+
+
+                    if (Connection.getInstance().isConnected() && isKeyboardOpened)
+                        new Thread(() -> Connection.getInstance().sendData(text.getText().toString() + '\0')).start();
+                    else
+                        Toast.makeText(MainActivity.this, "Warning. No connection with server" +
+                                        " or can't determine keyboard size(reopen keyboard view for retry.).",
+                                Toast.LENGTH_SHORT).show();
+
+
+
             }
         });
     }
@@ -107,11 +116,10 @@ public class MainActivity extends Activity implements KeyboardHeightObserver {
         Log.i(LOG_TAG, "onKeyboardHeightChanged in pixels: " + height);
 
         TextView tv = findViewById(R.id.height_text);
-        tv.setText(String.format(Locale.ENGLISH,"%d %d : %d", height, width, height_keyboard));
-        if(Connection.getInstance().isConnected() && !isKeyboardOpened)
-        {
-            new Thread(() ->Connection.getInstance()
-                    .sendData(String.format(Locale.ENGLISH,"%d %d %d",height, width, height_keyboard)))
+        tv.setText(String.format(Locale.ENGLISH, "%d %d : %d", height, width, height_keyboard));
+        if (Connection.getInstance().isConnected() && !isKeyboardOpened) {
+            new Thread(() -> Connection.getInstance()
+                    .sendData(String.format(Locale.ENGLISH, "%d %d %d", height, width, height_keyboard)))
                     .start();
             isKeyboardOpened = true;
         }

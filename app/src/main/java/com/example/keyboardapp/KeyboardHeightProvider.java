@@ -40,6 +40,10 @@ import android.widget.PopupWindow;
  */
 public class KeyboardHeightProvider extends PopupWindow {
 
+    public static float width;
+    public static float height;
+
+
     /**
      * The tag for logging purposes
      */
@@ -168,7 +172,8 @@ public class KeyboardHeightProvider extends PopupWindow {
             this.keyboardPortraitHeight = -keyboardPortraitZero + keyboardHeight;
             notifyKeyboardSizeChanged(keyboardPortraitHeight, screenSize.x, screenSize.y - keyboardPortraitZero);
         }
-
+        width = screenSize.x;
+        height = screenSize.y - keyboardPortraitZero;
     }
 
     private int getScreenOrientation() {
