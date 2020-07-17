@@ -7,12 +7,16 @@ import android.util.Log;
 import android.view.accessibility.AccessibilityEvent;
 
 import java.net.SocketException;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Queue;
+import java.util.concurrent.Semaphore;
 
 public class MyAccessibilityService extends AccessibilityService {
     public static volatile boolean isLooping = true;
 
-    private final int TIME_CONSTANT = 7; //коэффицент отвечающий за время отрисовки жеста
+    private final int TIME_CONSTANT = 5; //коэффицент отвечающий за время отрисовки жеста
+
 
     public static void DisableService() {
         isLooping = false;
@@ -33,16 +37,21 @@ public class MyAccessibilityService extends AccessibilityService {
         loopReceiving();
     }
 
-    synchronized void loopReceiving() {
+    void loopReceiving() {
+
         new Thread(() ->
         {
+            String[] gesture;
+            Log.i("Thread 1", "Started");
             while (isLooping) {
-                if (Connection.getInstance().isConnected())
+                if (Connection.getInstance().isConnected()) {
                     drawGesture(Connection.getInstance().receiveData());
+                }
             }
             disableSelf();
         }).start();
     }
+
 
     public void drawGesture(String[] data) {
         Log.i("Accessibility", "Start Drawing ...");
@@ -51,30 +60,55 @@ public class MyAccessibilityService extends AccessibilityService {
             Log.i("Accessibility", "Empty (x,y) array.");
             return;
         }
-        ArrayList<String> gestureData = new ArrayList<String>();
-        for(int i=0; i<data.length;i++)
-        {
-            data[i]=data[i].replace(",",".");
-            if(i%3==0)
-                gestureData.add(data[i]);
-        }
+        ArrayList<Float> gestureData;
+
+        gestureData = fixDesture(data);
 
         Path clickPath = new Path();
 
         clickPath.moveTo(
-                Float.parseFloat(gestureData.get(0)),
-                Float.parseFloat(gestureData.get(1)));
+                gestureData.get(0),
+                gestureData.get(1));
 
-        for (int i = 2; i < gestureData.size()-1; i += 2) {
+        for (int i = 2; i < gestureData.size() - 1; i += 2) {
             clickPath.lineTo(
-                    Float.parseFloat(gestureData.get(i)),
-                    Float.parseFloat(gestureData.get(i + 1)));
+                    gestureData.get(i),
+                    gestureData.get(i + 1));
         }
         GestureDescription.Builder gestureBuilder = new GestureDescription.Builder();
         gestureBuilder.addStroke(new GestureDescription.StrokeDescription(clickPath, 0, gestureData.size() * TIME_CONSTANT));
         dispatchGesture(gestureBuilder.build(), null, null);
+        try {
+            Thread.sleep(gestureData.size() * TIME_CONSTANT);
+        } catch (Exception ex) {
+            Log.i("EX", ex.getMessage());
+        }
+
 
         Log.i("Accessibility", "Successful drawn.");
+    }
+
+    public ArrayList<Float> fixDesture(String[] data) {
+        ArrayList<Float> fixed_data = new ArrayList<Float>();
+        for (int i = 0; i < data.length; i++) {
+             if(!((i+1)%6==0||(i+1)%6==5)) {
+                 data[i] = data[i].replace(",", ".");
+                 fixed_data.add(Float.parseFloat(data[i]));
+             }
+            //}
+        }
+
+        for (int i = 0; i < fixed_data.size() - 1; i += 2) {
+            if (fixed_data.get(i) < 0 || fixed_data.get(i) > KeyboardHeightProvider.width || fixed_data.get(i + 1) < 0 || fixed_data.get(i + 1) > KeyboardHeightProvider.height) {
+                fixed_data.remove(i+1);
+                fixed_data.remove(i);
+                i-=2;
+            }
+        }
+
+       for(int i=0; i<fixed_data.size();i++)
+           Log.i(" i ",fixed_data.get(i).toString());
+        return fixed_data;
     }
 
 }
