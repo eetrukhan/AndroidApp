@@ -74,25 +74,26 @@ public class MyAccessibilityService extends AccessibilityService {
 
         Path clickPath = new Path();
 
-        clickPath.moveTo(
-                gestureData.get(0),
-                gestureData.get(1));
+        if(gestureData.size()!=0) {
+            clickPath.moveTo(
+                    gestureData.get(0),
+                    gestureData.get(1));
 
-        for (int i = 2; i < gestureData.size() - 1; i += 2) {
-            clickPath.lineTo(
-                    gestureData.get(i),
-                    gestureData.get(i + 1));
+            for (int i = 2; i < gestureData.size() - 1; i += 2) {
+                clickPath.lineTo(
+                        gestureData.get(i),
+                        gestureData.get(i + 1));
+            }
+            GestureDescription.Builder gestureBuilder = new GestureDescription.Builder();
+            gestureBuilder.addStroke(new GestureDescription.StrokeDescription(clickPath, 0, gestureData.size() * TIME_CONSTANT));
+            dispatchGesture(gestureBuilder.build(), null, null);
+            try {
+                Thread.sleep(gestureData.size() * TIME_CONSTANT);
+            } catch (Exception ex) {
+                Log.i("EX", ex.getMessage());
+            }
+
         }
-        GestureDescription.Builder gestureBuilder = new GestureDescription.Builder();
-        gestureBuilder.addStroke(new GestureDescription.StrokeDescription(clickPath, 0, gestureData.size() * TIME_CONSTANT));
-        dispatchGesture(gestureBuilder.build(), null, null);
-        try {
-            Thread.sleep(gestureData.size() * TIME_CONSTANT);
-        } catch (Exception ex) {
-            Log.i("EX", ex.getMessage());
-        }
-
-
         Log.i("Accessibility", "Successful drawn.");
     }
 
@@ -103,20 +104,26 @@ public class MyAccessibilityService extends AccessibilityService {
                 data[i] = data[i].replace(",", ".");
                 fixed_data.add(Float.parseFloat(data[i]));
             }
-            //}
+
         }
 
-        for (int i = 0; i < fixed_data.size() - 1; i += 2) {
-            if (fixed_data.get(i) < 0 || fixed_data.get(i) > KeyboardHeightProvider.width || fixed_data.get(i + 1) < 0 || fixed_data.get(i + 1) > KeyboardHeightProvider.height) {
+
+        int i = 0;
+        while(i<fixed_data.size()-1) {
+            if (fixed_data.get(i) < 0 || fixed_data.get(i) > KeyboardHeightProvider.width || fixed_data.get(i + 1) < 0 || fixed_data.get(i + 1) > KeyboardHeightProvider.height ||
+                    (fixed_data.get(i+1)>0.79125*KeyboardHeightProvider.height&&(fixed_data.get(i)<KeyboardHeightProvider.width*0.31||fixed_data.get(i)>KeyboardHeightProvider.width*0.745))) {
                 fixed_data.remove(i + 1);
                 fixed_data.remove(i);
-                i -= 2;
-            }
+            }else
+                i+=2;
+
         }
 
-        for (int i = 0; i < fixed_data.size(); i++)
-            Log.i(" i ", fixed_data.get(i).toString());
+      for (int l = 0; l < fixed_data.size(); l++)
+            Log.i(" i ", fixed_data.get(l).toString());
+
         return fixed_data;
+
     }
 
 }
