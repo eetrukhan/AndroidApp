@@ -98,7 +98,8 @@ class Connection {
             return;
 
         try {
-            out.write(data);
+
+            out.write(data + "\r\n");
             out.flush();
 
             Log.i(LOG_TAG, "Sent: " + data);

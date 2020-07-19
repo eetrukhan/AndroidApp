@@ -51,6 +51,7 @@ public class MainActivity extends Activity implements KeyboardHeightObserver {
         View view = findViewById(R.id.activitylayout);
         view.post(() -> keyboardHeightProvider.start());
 
+        MyAccessibilityService.mainActivity = this;
         Connection.getInstance().loopConnection();
         MyAccessibilityService.isLooping = true;
 
@@ -63,8 +64,13 @@ public class MainActivity extends Activity implements KeyboardHeightObserver {
             startActivity(intent);
             e.setClickable(true);
         });
-
     }
+
+    public void clearEditText()
+    {
+        runOnUiThread(() -> ((EditText)findViewById(R.id.editText)).setText(""));
+    }
+
 
     void addTextEntryListener() {
         EditText text = findViewById(R.id.editText);
@@ -81,17 +87,12 @@ public class MainActivity extends Activity implements KeyboardHeightObserver {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-
                     if (Connection.getInstance().isConnected() && isKeyboardOpened)
-                        new Thread(() -> Connection.getInstance().sendData(text.getText().toString() + '\0')).start();
+                        new Thread(() -> Connection.getInstance().sendData(text.getText().toString())).start();
                     else
                         Toast.makeText(MainActivity.this, "Warning. No connection with server" +
                                         " or can't determine keyboard size(reopen keyboard view for retry.).",
                                 Toast.LENGTH_SHORT).show();
-
-
-
             }
         });
     }

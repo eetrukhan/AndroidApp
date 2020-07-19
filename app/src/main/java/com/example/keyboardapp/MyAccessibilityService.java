@@ -5,6 +5,8 @@ import android.accessibilityservice.GestureDescription;
 import android.graphics.Path;
 import android.util.Log;
 import android.view.accessibility.AccessibilityEvent;
+import android.widget.EditText;
+import android.widget.TextView;
 
 import java.net.SocketException;
 import java.util.ArrayDeque;
@@ -13,10 +15,11 @@ import java.util.Queue;
 import java.util.concurrent.Semaphore;
 
 public class MyAccessibilityService extends AccessibilityService {
+    public static MainActivity mainActivity;
+
     public static volatile boolean isLooping = true;
 
     private final int TIME_CONSTANT = 5; //коэффицент отвечающий за время отрисовки жеста
-
 
     public static void DisableService() {
         isLooping = false;
@@ -45,7 +48,12 @@ public class MyAccessibilityService extends AccessibilityService {
             Log.i("Thread 1", "Started");
             while (isLooping) {
                 if (Connection.getInstance().isConnected()) {
-                    drawGesture(Connection.getInstance().receiveData());
+                    String[] receivedData = Connection.getInstance().receiveData();
+                    if (mainActivity != null && receivedData != null &&
+                            receivedData.length > 0 && receivedData[0].equals("clear")) {
+                        mainActivity.clearEditText();
+                    } else
+                        drawGesture(receivedData);
                 }
             }
             disableSelf();
@@ -96,19 +104,10 @@ public class MyAccessibilityService extends AccessibilityService {
                 data[i] = data[i].replace(",", ".");
                 fixed_data.add(Float.parseFloat(data[i]));
             }
+
         }
 
-       /* for (int i = 0; i < fixed_data.size() - 1; i += 2) {
-            if (fixed_data.get(i) < 0 || fixed_data.get(i) > KeyboardHeightProvider.width || fixed_data.get(i + 1) < 0 || fixed_data.get(i + 1) > KeyboardHeightProvider.height) {
-                fixed_data.remove(i + 1);
-                fixed_data.remove(i);
-                if (i > 0)
-                    i -= 2;
-                else
-                    i = 0;
 
-            }
-        }*/
         int i = 0;
         while(i<fixed_data.size()-1) {
             if (fixed_data.get(i) < 0 || fixed_data.get(i) > KeyboardHeightProvider.width || fixed_data.get(i + 1) < 0 || fixed_data.get(i + 1) > KeyboardHeightProvider.height ||
@@ -120,8 +119,9 @@ public class MyAccessibilityService extends AccessibilityService {
 
         }
 
-        for (int l = 0; l < fixed_data.size(); l++)
+      for (int l = 0; l < fixed_data.size(); l++)
             Log.i(" i ", fixed_data.get(l).toString());
+
         return fixed_data;
 
     }
