@@ -42,6 +42,7 @@ public class KeyboardHeightProvider extends PopupWindow {
 
     public static float width;
     public static float height;
+    public static float keyboard_height;
 
 
     /**
@@ -174,6 +175,7 @@ public class KeyboardHeightProvider extends PopupWindow {
         }
         width = screenSize.x;
         height = screenSize.y - keyboardPortraitZero;
+        keyboard_height = keyboardPortraitHeight;
     }
 
     private int getScreenOrientation() {
