@@ -50,8 +50,13 @@ public class MyAccessibilityService extends AccessibilityService {
                 if (Connection.getInstance().isConnected()) {
                     String[] receivedData = Connection.getInstance().receiveData();
                     if (mainActivity != null && receivedData != null &&
-                            receivedData.length > 0 && receivedData[0].equals("clear")) {
-                        mainActivity.clearEditText();
+                            receivedData.length > 0) {
+                        if(receivedData[0].equals("clear"))
+                            mainActivity.clearEditText();
+                        if(receivedData[0].equals("screenshot")) {
+                            Log.i("Accessibility word parse","sent screenshot");
+                            mainActivity.sendScreenshot();
+                        }
                     } else
                         drawGesture(receivedData);
                 }

@@ -19,6 +19,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Locale;
 
@@ -27,6 +28,7 @@ public class MainActivity extends Activity implements KeyboardHeightObserver {
     private final static String LOG_TAG = "Main Activity";
 
     private KeyboardHeightProvider keyboardHeightProvider;
+    private WordPredictions wordPredictions = new WordPredictions();
 
     private boolean isKeyboardOpened = false;
 
@@ -58,6 +60,7 @@ public class MainActivity extends Activity implements KeyboardHeightObserver {
         addTextEntryListener();
 
         Button button = findViewById(R.id.button);
+        Button buttonScreen = findViewById(R.id.buttonScreen);
         button.setOnClickListener((e) -> {
             e.setClickable(false);
             Intent intent = new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS);
@@ -66,18 +69,32 @@ public class MainActivity extends Activity implements KeyboardHeightObserver {
         });
     }
 
-    public void clearEditText()
-    {
-        runOnUiThread(() -> ((EditText)findViewById(R.id.editText)).setText(""));
+    public void clearEditText() {
+        runOnUiThread(() -> ((EditText) findViewById(R.id.editText)).setText(""));
     }
 
+    public void sendScreenshot()
+    {
+        if (Connection.getInstance().isConnected() && isKeyboardOpened) {
+            WordPredictions.verifyStoragePermissions(MainActivity.this);
+            File screenshot = wordPredictions.takeScreenshot(MainActivity.this);
+            new Thread(() -> {
+                Connection.getInstance().sendFile(screenshot);
+            }).start();
+        }
+        else
+        {
+            Toast.makeText(MainActivity.this, "Warning. No connection with server" +
+                            "Screenshot",
+                    Toast.LENGTH_SHORT).show();
+        }
+    }
 
     void addTextEntryListener() {
         EditText text = findViewById(R.id.editText);
         text.addTextChangedListener(new TextWatcher() {
             @Override
             public void afterTextChanged(Editable s) {
-                // TODO Auto-generated method stub
             }
 
             @Override
@@ -87,12 +104,14 @@ public class MainActivity extends Activity implements KeyboardHeightObserver {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                    if (Connection.getInstance().isConnected() && isKeyboardOpened)
-                        new Thread(() -> Connection.getInstance().sendData(text.getText().toString())).start();
-                    else
-                        Toast.makeText(MainActivity.this, "Warning. No connection with server" +
-                                        " or can't determine keyboard size(reopen keyboard view for retry.).",
-                                Toast.LENGTH_SHORT).show();
+                if (Connection.getInstance().isConnected() && isKeyboardOpened) {
+                    new Thread(() -> {
+                        Connection.getInstance().sendData(text.getText().toString());
+                    }).start();
+                } else
+                    Toast.makeText(MainActivity.this, "Warning. No connection with server" +
+                                    " or can't determine keyboard size(reopen keyboard view for retry.).",
+                            Toast.LENGTH_SHORT).show();
             }
         });
     }
