@@ -25,7 +25,7 @@ public class MyAccessibilityService extends AccessibilityService {
         isLooping = false;
     }
 
-
+    long predictionsClickedTime;
     @Override
     public void onAccessibilityEvent(AccessibilityEvent event) {
     }
@@ -59,7 +59,18 @@ public class MyAccessibilityService extends AccessibilityService {
         clickBuilder3.addStroke(clickStroke1);
 
 
-        dispatchGesture(clickBuilder3.build(), null, null);
+        dispatchGesture(clickBuilder3.build(), new GestureResultCallback() {
+            @Override
+            public void onCompleted(GestureDescription gestureDescription) {
+                predictionsClickedTime = System.currentTimeMillis();
+                new Thread (() -> mainActivity.sendPredictions()).start();
+            }
+
+            @Override
+            public void onCancelled(GestureDescription gestureDescription) {
+                super.onCancelled(gestureDescription);
+            }
+        }, null);
 
     }
 

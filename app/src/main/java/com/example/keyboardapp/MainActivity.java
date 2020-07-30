@@ -43,7 +43,8 @@ public class MainActivity extends Activity implements KeyboardHeightObserver {
     int tc_counter = 0;
     ArrayList<String> words = new ArrayList<String>();
 
-    String[] predictions = new String[3];
+    String[] predictions = {"", "", ""};
+    long start;
 
     @Override
     protected void onDestroy() {
@@ -98,8 +99,8 @@ public class MainActivity extends Activity implements KeyboardHeightObserver {
     }
 
     void addTextEntryListener() {
-        EditText text = findViewById(R.id.editText);
-        text.addTextChangedListener(new TextWatcher() {
+        EditText textEdit = findViewById(R.id.editText);
+        textEdit.addTextChangedListener(new TextWatcher() {
             @Override
             public void afterTextChanged(Editable s) {
             }
@@ -119,36 +120,53 @@ public class MainActivity extends Activity implements KeyboardHeightObserver {
 //                    Toast.makeText(MainActivity.this, "Warning. No connection with server" +
 //                                    " or can't determine keyboard size(reopen keyboard view for retry.).",
 //                            Toast.LENGTH_SHORT).show();
-                TextView tw = findViewById(R.id.textView);
                 ++tc_counter;
                 if (tc_counter == 1) {
                     service.predictionsDoubleClick();
                     predictions[1] = s.toString();
-                }
-                if(tc_counter == 5)
-                {
+                } else if (s.length() == 0) {
+                    tc_counter = 0;
+                } else {
                     String text = s.toString();
                     int index = 0;
-                    for(int i = 0;i < text.length(); ++i)
-                    {
-                        if(text.charAt(i) > 'А' && text.charAt(i) < 'Я')
+                    for (int i = 1; i < text.length(); ++i) {
+                        if (text.charAt(i) >= 'А' && text.charAt(i) <= 'Я') {
                             index = i;
+                            break;
+                        }
                     }
-
-                    //String[] splitted = text.split("(?=\\p{Lu})");
-                    predictions[0] = text.substring(0,index).trim();
-                    predictions[2] = text.substring(index).trim();
-                    tw.setText(predictions[0] + " - " + predictions[1] + " - " + predictions[2]);
-                }
-                if(s.length() == 0) {
-                    predictions[0] = "";
-                    predictions[2] = "";
-                    tc_counter = 0;
+                    if (index != 0) {
+                        predictions[0] = text.substring(0, index).trim();
+                        predictions[2] = text.substring(index).trim();
+                    } else {
+                        predictions[0] = text.trim();
+                    }
                 }
             }
         });
     }
 
+    public void sendPredictions() {
+        try {
+            Thread.sleep(200);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        runOnUiThread(() -> {
+            TextView tw = findViewById(R.id.textView);
+            EditText textEdit = findViewById(R.id.editText);
+
+            String temp = predictions[0] + " - " + predictions[1] + " - " + predictions[2];
+            tw.setText(temp);
+
+            predictions[0] = "";
+            predictions[1] = "";
+            predictions[2] = "";
+
+            textEdit.setText("");
+        });
+    }
 
     @Override
     public void onPause() {
