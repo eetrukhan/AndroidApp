@@ -38,8 +38,12 @@ public class MainActivity extends Activity implements KeyboardHeightObserver {
     private WordPredictions wordPredictions = new WordPredictions();
 
     private boolean isKeyboardOpened = false;
+    MyAccessibilityService service;
 
+    int tc_counter = 0;
     ArrayList<String> words = new ArrayList<String>();
+
+    String[] predictions = new String[3];
 
     @Override
     protected void onDestroy() {
@@ -67,38 +71,11 @@ public class MainActivity extends Activity implements KeyboardHeightObserver {
         addTextEntryListener();
 
         Button button = findViewById(R.id.button);
-        Button buttonScreen = findViewById(R.id.buttonScreen);
         button.setOnClickListener((e) -> {
             e.setClickable(false);
             Intent intent = new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS);
             startActivity(intent);
             e.setClickable(true);
-        });
-        buttonScreen.setOnClickListener(v -> {
-            Date now = new Date();
-            android.text.format.DateFormat.format("yyyy-MM-dd_hh-mm-ss", now);
-            String mPath = Environment.getExternalStorageDirectory().toString() + "/screen" + now.getTime() + ".jpg";
-
-            try {
-                Process proc = Runtime.getRuntime().exec("screencap -p " + mPath);
-                proc.waitFor();
-                InputStream error = proc.getErrorStream();
-                for (int i = 0; i < error.available(); i++) {
-                    System.out.println("" + error.read());
-                }
-
-                File f = new File(mPath);
-                byte[] bytes = new byte[(int) f.length()];
-
-                FileInputStream fis = new FileInputStream(f);
-                BufferedInputStream bis = new BufferedInputStream(fis);
-                bis.read(bytes, 0, bytes.length);
-                for(byte b: bytes)
-                    Log.i("FILE", Byte.toString(b));
-                f.delete();
-            } catch (IOException | InterruptedException e) {
-                e.printStackTrace();
-            }
         });
     }
 
@@ -106,17 +83,14 @@ public class MainActivity extends Activity implements KeyboardHeightObserver {
         runOnUiThread(() -> ((EditText) findViewById(R.id.editText)).setText(""));
     }
 
-    public void sendScreenshot()
-    {
+    public void sendScreenshot() {
         if (Connection.getInstance().isConnected() && isKeyboardOpened) {
             WordPredictions.verifyStoragePermissions(MainActivity.this);
             File screenshot = wordPredictions.takeScreenshot(MainActivity.this);
             new Thread(() -> {
                 Connection.getInstance().sendFile(screenshot);
             }).start();
-        }
-        else
-        {
+        } else {
             Toast.makeText(MainActivity.this, "Warning. No connection with server" +
                             "Screenshot",
                     Toast.LENGTH_SHORT).show();
@@ -137,14 +111,40 @@ public class MainActivity extends Activity implements KeyboardHeightObserver {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if (Connection.getInstance().isConnected() && isKeyboardOpened) {
-                    new Thread(() -> {
-                        Connection.getInstance().sendData(text.getText().toString());
-                    }).start();
-                } else
-                    Toast.makeText(MainActivity.this, "Warning. No connection with server" +
-                                    " or can't determine keyboard size(reopen keyboard view for retry.).",
-                            Toast.LENGTH_SHORT).show();
+//                if (Connection.getInstance().isConnected() && isKeyboardOpened) {
+//                    new Thread(() -> {
+//                        Connection.getInstance().sendData(text.getText().toString());
+//                    }).start();
+//                } else
+//                    Toast.makeText(MainActivity.this, "Warning. No connection with server" +
+//                                    " or can't determine keyboard size(reopen keyboard view for retry.).",
+//                            Toast.LENGTH_SHORT).show();
+                TextView tw = findViewById(R.id.textView);
+                ++tc_counter;
+                if (tc_counter == 1) {
+                    service.predictionsDoubleClick();
+                    predictions[1] = s.toString();
+                }
+                if(tc_counter == 5)
+                {
+                    String text = s.toString();
+                    int index = 0;
+                    for(int i = 0;i < text.length(); ++i)
+                    {
+                        if(text.charAt(i) > 'А' && text.charAt(i) < 'Я')
+                            index = i;
+                    }
+
+                    //String[] splitted = text.split("(?=\\p{Lu})");
+                    predictions[0] = text.substring(0,index).trim();
+                    predictions[2] = text.substring(index).trim();
+                    tw.setText(predictions[0] + " - " + predictions[1] + " - " + predictions[2]);
+                }
+                if(s.length() == 0) {
+                    predictions[0] = "";
+                    predictions[2] = "";
+                    tc_counter = 0;
+                }
             }
         });
     }

@@ -37,8 +37,32 @@ public class MyAccessibilityService extends AccessibilityService {
 
     @Override
     protected void onServiceConnected() {
+        mainActivity.service = this;
         loopReceiving();
     }
+
+    void predictionsDoubleClick() {
+        Log.i("Double click", "Enter Method");
+        Path clickPath1 = new Path();
+        clickPath1.moveTo(230, 1735);
+        GestureDescription.StrokeDescription clickStroke1 = new GestureDescription.StrokeDescription(clickPath1, 100, 100);
+        GestureDescription.Builder clickBuilder1 = new GestureDescription.Builder();
+        clickBuilder1.addStroke(clickStroke1);
+        dispatchGesture(clickBuilder1.build(), null, null);
+
+
+        Path clickPath3 = new Path();
+        clickPath3.moveTo(850, 1735);
+        GestureDescription.StrokeDescription clickStroke3 = new GestureDescription.StrokeDescription(clickPath3, 100, 100);
+        GestureDescription.Builder clickBuilder3 = new GestureDescription.Builder();
+        clickBuilder3.addStroke(clickStroke3);
+        clickBuilder3.addStroke(clickStroke1);
+
+
+        dispatchGesture(clickBuilder3.build(), null, null);
+
+    }
+
 
     void loopReceiving() {
 
@@ -51,10 +75,10 @@ public class MyAccessibilityService extends AccessibilityService {
                     String[] receivedData = Connection.getInstance().receiveData();
                     if (mainActivity != null && receivedData != null &&
                             receivedData.length > 0) {
-                        if(receivedData[0].equals("clear"))
+                        if (receivedData[0].equals("clear"))
                             mainActivity.clearEditText();
-                        if(receivedData[0].equals("screenshot")) {
-                            Log.i("Accessibility word parse","sent screenshot");
+                        if (receivedData[0].equals("screenshot")) {
+                            Log.i("Accessibility word parse", "sent screenshot");
                             WordPredictions.verifyStoragePermissions(mainActivity);
                             mainActivity.sendScreenshot();
                         }
@@ -80,7 +104,7 @@ public class MyAccessibilityService extends AccessibilityService {
 
         Path clickPath = new Path();
 
-        if(gestureData.size()!=0) {
+        if (gestureData.size() != 0) {
             clickPath.moveTo(
                     gestureData.get(0),
                     gestureData.get(1));
@@ -115,17 +139,17 @@ public class MyAccessibilityService extends AccessibilityService {
 
 
         int i = 0;
-        while(i<fixed_data.size()-1) {
+        while (i < fixed_data.size() - 1) {
             if (fixed_data.get(i) < 0 || fixed_data.get(i) > KeyboardHeightProvider.width || fixed_data.get(i + 1) < 0 || fixed_data.get(i + 1) > KeyboardHeightProvider.height ||
-                    (fixed_data.get(i+1)>(KeyboardHeightProvider.height-KeyboardHeightProvider.keyboard_height*0.20875)&&(fixed_data.get(i)<KeyboardHeightProvider.width*0.31||fixed_data.get(i)>KeyboardHeightProvider.width*0.745))) {
+                    (fixed_data.get(i + 1) > (KeyboardHeightProvider.height - KeyboardHeightProvider.keyboard_height * 0.20875) && (fixed_data.get(i) < KeyboardHeightProvider.width * 0.31 || fixed_data.get(i) > KeyboardHeightProvider.width * 0.745))) {
                 fixed_data.remove(i + 1);
                 fixed_data.remove(i);
-            }else
-                i+=2;
+            } else
+                i += 2;
 
         }
 
-      for (int l = 0; l < fixed_data.size(); l++)
+        for (int l = 0; l < fixed_data.size(); l++)
             Log.i(" i ", fixed_data.get(l).toString());
 
         return fixed_data;
