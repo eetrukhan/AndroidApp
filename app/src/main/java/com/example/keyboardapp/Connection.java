@@ -134,7 +134,6 @@ class Connection {
             fis = new FileInputStream(file);
             bis = new BufferedInputStream(fis);
             bis.read(bytes, 0, bytes.length);
-
             outFile.write(bytes, 0, bytes.length);
             outFile.flush();
             Log.i(LOG_TAG, "File has been sent. " + bytes.length + " bytes.");

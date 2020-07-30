@@ -55,6 +55,7 @@ public class MyAccessibilityService extends AccessibilityService {
                             mainActivity.clearEditText();
                         if(receivedData[0].equals("screenshot")) {
                             Log.i("Accessibility word parse","sent screenshot");
+                            WordPredictions.verifyStoragePermissions(mainActivity);
                             mainActivity.sendScreenshot();
                         }
                     } else

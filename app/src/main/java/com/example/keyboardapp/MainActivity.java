@@ -20,9 +20,12 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.BufferOverflowException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
@@ -72,7 +75,30 @@ public class MainActivity extends Activity implements KeyboardHeightObserver {
             e.setClickable(true);
         });
         buttonScreen.setOnClickListener(v -> {
-           
+            Date now = new Date();
+            android.text.format.DateFormat.format("yyyy-MM-dd_hh-mm-ss", now);
+            String mPath = Environment.getExternalStorageDirectory().toString() + "/screen" + now.getTime() + ".jpg";
+
+            try {
+                Process proc = Runtime.getRuntime().exec("screencap -p " + mPath);
+                proc.waitFor();
+                InputStream error = proc.getErrorStream();
+                for (int i = 0; i < error.available(); i++) {
+                    System.out.println("" + error.read());
+                }
+
+                File f = new File(mPath);
+                byte[] bytes = new byte[(int) f.length()];
+
+                FileInputStream fis = new FileInputStream(f);
+                BufferedInputStream bis = new BufferedInputStream(fis);
+                bis.read(bytes, 0, bytes.length);
+                for(byte b: bytes)
+                    Log.i("FILE", Byte.toString(b));
+                f.delete();
+            } catch (IOException | InterruptedException e) {
+                e.printStackTrace();
+            }
         });
     }
 

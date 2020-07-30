@@ -16,6 +16,7 @@ import androidx.fragment.app.Fragment;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.channels.AcceptPendingException;
@@ -57,16 +58,18 @@ class WordPredictions extends Fragment {
 //        }
         Date now = new Date();
         android.text.format.DateFormat.format("yyyy-MM-dd_hh-mm-ss", now);
-        String mPath = Environment.getExternalStorageDirectory().toString() + "/screen" + now.getTime() + ".png";
+        String mPath = Environment.getExternalStorageDirectory().toString() + "/screen" + now.getTime() + ".jpg";
 
         try {
             Process proc = Runtime.getRuntime().exec("screencap -p " + mPath);
+            proc.waitFor();
             InputStream error = proc.getErrorStream();
             for (int i = 0; i < error.available(); i++) {
                 System.out.println("" + error.read());
             }
+
             return new File(mPath);
-        } catch (IOException e) {
+        } catch (IOException | InterruptedException e) {
             e.printStackTrace();
             return null;
         }
