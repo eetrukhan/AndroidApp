@@ -5,6 +5,8 @@ import android.accessibilityservice.GestureDescription;
 import android.graphics.Path;
 import android.util.Log;
 import android.view.accessibility.AccessibilityEvent;
+import android.view.accessibility.AccessibilityNodeInfo;
+import android.view.accessibility.AccessibilityWindowInfo;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -26,9 +28,6 @@ public class MyAccessibilityService extends AccessibilityService {
     }
 
     long predictionsClickedTime;
-    @Override
-    public void onAccessibilityEvent(AccessibilityEvent event) {
-    }
 
     @Override
     public void onInterrupt() {
@@ -46,9 +45,6 @@ public class MyAccessibilityService extends AccessibilityService {
         Path clickPath1 = new Path();
         clickPath1.moveTo(230, 1735);
         GestureDescription.StrokeDescription clickStroke1 = new GestureDescription.StrokeDescription(clickPath1, 100, 100);
-        GestureDescription.Builder clickBuilder1 = new GestureDescription.Builder();
-        clickBuilder1.addStroke(clickStroke1);
-        dispatchGesture(clickBuilder1.build(), null, null);
 
 
         Path clickPath3 = new Path();
@@ -58,12 +54,10 @@ public class MyAccessibilityService extends AccessibilityService {
         clickBuilder3.addStroke(clickStroke3);
         clickBuilder3.addStroke(clickStroke1);
 
-
         dispatchGesture(clickBuilder3.build(), new GestureResultCallback() {
             @Override
             public void onCompleted(GestureDescription gestureDescription) {
-                predictionsClickedTime = System.currentTimeMillis();
-                new Thread (() -> mainActivity.sendPredictions()).start();
+                new Thread(() -> mainActivity.sendPredictions()).start();
             }
 
             @Override
@@ -86,19 +80,45 @@ public class MyAccessibilityService extends AccessibilityService {
                     String[] receivedData = Connection.getInstance().receiveData();
                     if (mainActivity != null && receivedData != null &&
                             receivedData.length > 0) {
-                        if (receivedData[0].equals("clear"))
+                        Log.i("Accessibility", "choose case enter . . .");
+
+                        if (receivedData[0].equals("clear")) {
+                            Log.i("Accessibility", "clear case enter . . .");
                             mainActivity.clearEditText();
-                        if (receivedData[0].equals("screenshot")) {
+                        } else if (receivedData[0].equals("screenshot")) {
                             Log.i("Accessibility word parse", "sent screenshot");
                             WordPredictions.verifyStoragePermissions(mainActivity);
                             mainActivity.sendScreenshot();
+                        } else {
+                            Log.i("Accessibility", "draw case enter . . .");
+                            drawGesture(receivedData);
                         }
-                    } else
-                        drawGesture(receivedData);
+                    }
                 }
             }
             disableSelf();
         }).start();
+    }
+
+    void windowViewTree() {
+        AccessibilityWindowInfo wInfo = AccessibilityWindowInfo.obtain();
+
+        wInfo.describeContents();
+
+
+    }
+
+    @Override
+    public void onAccessibilityEvent(AccessibilityEvent event) {
+        Log.i("Accessibility event", "Happened");
+
+        AccessibilityNodeInfo mSource = event.getSource();
+        int child = mSource.getChildCount();
+        // iterate through all child of parent view
+        for (int i = 0; i < child; i++) {
+            AccessibilityNodeInfo childNodeView = mSource.getChild(i);
+            Log.i("Accessibility Tree", childNodeView.getClassName().toString());
+        }
     }
 
 

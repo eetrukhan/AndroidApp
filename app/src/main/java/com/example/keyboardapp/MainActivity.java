@@ -11,6 +11,7 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
+import android.view.accessibility.AccessibilityWindowInfo;
 import android.widget.Button;
 import android.widget.EditText;
 
@@ -78,6 +79,14 @@ public class MainActivity extends Activity implements KeyboardHeightObserver {
             startActivity(intent);
             e.setClickable(true);
         });
+
+        Button buttonDev = findViewById(R.id.buttonDev);
+        buttonDev.setOnClickListener((e) -> {
+            e.setClickable(false);
+            Log.i("Window Tree (Child count)",Integer.toString(AccessibilityWindowInfo.obtain().getChildCount()));
+            Log.i("Window Tree (Root)",AccessibilityWindowInfo.obtain().getChild(0).toString());
+            e.setClickable(true);
+        });
     }
 
     public void clearEditText() {
@@ -112,21 +121,23 @@ public class MainActivity extends Activity implements KeyboardHeightObserver {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-//                if (Connection.getInstance().isConnected() && isKeyboardOpened) {
-//                    new Thread(() -> {
-//                        Connection.getInstance().sendData(text.getText().toString());
-//                    }).start();
-//                } else
-//                    Toast.makeText(MainActivity.this, "Warning. No connection with server" +
-//                                    " or can't determine keyboard size(reopen keyboard view for retry.).",
-//                            Toast.LENGTH_SHORT).show();
+                if(service == null) {
+                    Log.i("Double Tap Prediction", "Accessibility not enabled.");
+                    return;
+                }
+
                 ++tc_counter;
                 if (tc_counter == 1) {
                     service.predictionsDoubleClick();
-                    predictions[1] = s.toString();
+                    predictions[1] = s.toString().toLowerCase();
                 } else if (s.length() == 0) {
                     tc_counter = 0;
-                } else {
+                }
+                else if (tc_counter > 5)
+                {
+                    textEdit.setText("");
+                }
+                else {
                     String text = s.toString();
                     int index = 0;
                     for (int i = 1; i < text.length(); ++i) {
@@ -136,10 +147,10 @@ public class MainActivity extends Activity implements KeyboardHeightObserver {
                         }
                     }
                     if (index != 0) {
-                        predictions[0] = text.substring(0, index).trim();
-                        predictions[2] = text.substring(index).trim();
+                        predictions[0] = text.substring(0, index).trim().toLowerCase();
+                        predictions[2] = text.substring(index).trim().toLowerCase();
                     } else {
-                        predictions[0] = text.trim();
+                        predictions[0] = text.trim().toLowerCase();
                     }
                 }
             }
@@ -147,17 +158,21 @@ public class MainActivity extends Activity implements KeyboardHeightObserver {
     }
 
     public void sendPredictions() {
+        if (!Connection.getInstance().isConnected() || !isKeyboardOpened)
+            return;
+
         try {
             Thread.sleep(200);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
 
+        String temp = predictions[0] + ";" + predictions[1] + ";" + predictions[2];
+
         runOnUiThread(() -> {
             TextView tw = findViewById(R.id.textView);
             EditText textEdit = findViewById(R.id.editText);
 
-            String temp = predictions[0] + " - " + predictions[1] + " - " + predictions[2];
             tw.setText(temp);
 
             predictions[0] = "";
@@ -166,6 +181,15 @@ public class MainActivity extends Activity implements KeyboardHeightObserver {
 
             textEdit.setText("");
         });
+
+        if (Connection.getInstance().isConnected() && isKeyboardOpened) {
+            new Thread(() -> {
+                Connection.getInstance().sendData(temp);
+            }).start();
+        } else
+            Toast.makeText(MainActivity.this,
+                    "Warning. No connection with server or reopen keyboard view",
+                    Toast.LENGTH_SHORT).show();
     }
 
     @Override
