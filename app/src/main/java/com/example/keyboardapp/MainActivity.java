@@ -83,8 +83,8 @@ public class MainActivity extends Activity implements KeyboardHeightObserver {
         Button buttonDev = findViewById(R.id.buttonDev);
         buttonDev.setOnClickListener((e) -> {
             e.setClickable(false);
-            Log.i("Window Tree (Child count)",Integer.toString(AccessibilityWindowInfo.obtain().getChildCount()));
-            Log.i("Window Tree (Root)",AccessibilityWindowInfo.obtain().getChild(0).toString());
+//            Log.i("Window Tree (Child count)",Integer.toString(AccessibilityWindowInfo.obtain().getChildCount()));
+//            Log.i("Window Tree (Root)",AccessibilityWindowInfo.obtain().getChild(0).toString());
             e.setClickable(true);
         });
     }
