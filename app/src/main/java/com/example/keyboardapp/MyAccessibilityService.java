@@ -41,14 +41,17 @@ public class MyAccessibilityService extends AccessibilityService {
     }
 
     void predictionsDoubleClick() {
-        Log.i("Double click", "Enter Method");
+        int x1 = (int) (KeyboardHeightProvider.width/4);
+        int x2 = (int)(KeyboardHeightProvider.width*3/4);
+        int y = (int)(KeyboardHeightProvider.height-KeyboardHeightProvider.keyboard_height+60);
+       Log.i("Double click", "Enter Method");
         Path clickPath1 = new Path();
-        clickPath1.moveTo(230, 1735);
+        clickPath1.moveTo(x1, y);
         GestureDescription.StrokeDescription clickStroke1 = new GestureDescription.StrokeDescription(clickPath1, 100, 100);
 
 
         Path clickPath3 = new Path();
-        clickPath3.moveTo(850, 1735);
+        clickPath3.moveTo(x2, y);
         GestureDescription.StrokeDescription clickStroke3 = new GestureDescription.StrokeDescription(clickPath3, 100, 100);
         GestureDescription.Builder clickBuilder3 = new GestureDescription.Builder();
         clickBuilder3.addStroke(clickStroke3);
@@ -65,6 +68,7 @@ public class MyAccessibilityService extends AccessibilityService {
                 super.onCancelled(gestureDescription);
             }
         }, null);
+
 
     }
 
@@ -180,8 +184,12 @@ public class MyAccessibilityService extends AccessibilityService {
 
         }
 
+         fixed_data.remove(0);
+         fixed_data.remove(0);
+
         for (int l = 0; l < fixed_data.size(); l++)
             Log.i(" i ", fixed_data.get(l).toString());
+
 
         return fixed_data;
 
