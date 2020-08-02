@@ -47,12 +47,12 @@ public class MyAccessibilityService extends AccessibilityService {
        Log.i("Double click", "Enter Method");
         Path clickPath1 = new Path();
         clickPath1.moveTo(x1, y);
-        GestureDescription.StrokeDescription clickStroke1 = new GestureDescription.StrokeDescription(clickPath1, 100, 100);
+        GestureDescription.StrokeDescription clickStroke1 = new GestureDescription.StrokeDescription(clickPath1, 30, 50);
 
 
         Path clickPath3 = new Path();
         clickPath3.moveTo(x2, y);
-        GestureDescription.StrokeDescription clickStroke3 = new GestureDescription.StrokeDescription(clickPath3, 100, 100);
+        GestureDescription.StrokeDescription clickStroke3 = new GestureDescription.StrokeDescription(clickPath3, 30, 50);
         GestureDescription.Builder clickBuilder3 = new GestureDescription.Builder();
         clickBuilder3.addStroke(clickStroke3);
         clickBuilder3.addStroke(clickStroke1);
@@ -60,6 +60,7 @@ public class MyAccessibilityService extends AccessibilityService {
         dispatchGesture(clickBuilder3.build(), new GestureResultCallback() {
             @Override
             public void onCompleted(GestureDescription gestureDescription) {
+                super.onCompleted(gestureDescription);
                 new Thread(() -> mainActivity.sendPredictions()).start();
             }
 
@@ -95,6 +96,7 @@ public class MyAccessibilityService extends AccessibilityService {
                             mainActivity.sendScreenshot();
                         } else {
                             Log.i("Accessibility", "draw case enter . . .");
+                            while(WaitDrawEnd);
                             drawGesture(receivedData);
                         }
                     }
@@ -125,6 +127,7 @@ public class MyAccessibilityService extends AccessibilityService {
         }
     }
 
+    boolean WaitDrawEnd = false;
 
     public void drawGesture(String[] data) {
         Log.i("Accessibility", "Start Drawing ...");
@@ -151,13 +154,18 @@ public class MyAccessibilityService extends AccessibilityService {
             }
             GestureDescription.Builder gestureBuilder = new GestureDescription.Builder();
             gestureBuilder.addStroke(new GestureDescription.StrokeDescription(clickPath, 0, gestureData.size() * TIME_CONSTANT));
-            dispatchGesture(gestureBuilder.build(), null, null);
-            try {
-                Thread.sleep(gestureData.size() * TIME_CONSTANT);
-            } catch (Exception ex) {
-                Log.i("EX", ex.getMessage());
-            }
+            WaitDrawEnd = true;
+            dispatchGesture(gestureBuilder.build(), new GestureResultCallback() {
+                @Override
+                public void onCompleted(GestureDescription gestureDescription) {
+                    super.onCompleted(gestureDescription);
+                }
 
+                @Override
+                public void onCancelled(GestureDescription gestureDescription) {
+                    super.onCancelled(gestureDescription);
+                }
+            }, null);
         }
         Log.i("Accessibility", "Successful drawn.");
     }
@@ -184,8 +192,6 @@ public class MyAccessibilityService extends AccessibilityService {
 
         }
 
-         fixed_data.remove(0);
-         fixed_data.remove(0);
 
         for (int l = 0; l < fixed_data.size(); l++)
             Log.i(" i ", fixed_data.get(l).toString());

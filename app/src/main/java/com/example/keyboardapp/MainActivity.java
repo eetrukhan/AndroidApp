@@ -83,14 +83,18 @@ public class MainActivity extends Activity implements KeyboardHeightObserver {
         Button buttonDev = findViewById(R.id.buttonDev);
         buttonDev.setOnClickListener((e) -> {
             e.setClickable(false);
-//            Log.i("Window Tree (Child count)",Integer.toString(AccessibilityWindowInfo.obtain().getChildCount()));
-//            Log.i("Window Tree (Root)",AccessibilityWindowInfo.obtain().getChild(0).toString());
+            Log.i("Window Tree (Child count)", Integer.toString(
+                    AccessibilityWindowInfo.obtain().describeContents()));
+            //Log.i("Window Tree (Root)",AccessibilityWindowInfo.obtain().getChild(0).toString());
             e.setClickable(true);
         });
     }
 
     public void clearEditText() {
-        runOnUiThread(() -> ((EditText) findViewById(R.id.editText)).setText(""));
+        runOnUiThread(() -> {
+            ((EditText) findViewById(R.id.editText)).setText("");
+            service.WaitDrawEnd = false;
+        });
     }
 
     public void sendScreenshot() {
@@ -112,16 +116,8 @@ public class MainActivity extends Activity implements KeyboardHeightObserver {
         textEdit.addTextChangedListener(new TextWatcher() {
             @Override
             public void afterTextChanged(Editable s) {
-            }
 
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                // TODO Auto-generated method stub
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if(service == null) {
+                if (service == null) {
                     Log.i("Double Tap Prediction", "Accessibility not enabled.");
                     return;
                 }
@@ -132,12 +128,7 @@ public class MainActivity extends Activity implements KeyboardHeightObserver {
                     predictions[1] = s.toString().toLowerCase();
                 } else if (s.length() == 0) {
                     tc_counter = 0;
-                }
-                else if (tc_counter > 5)
-                {
-                    textEdit.setText("");
-                }
-                else {
+                } else {
                     String text = s.toString();
                     int index = 0;
                     for (int i = 1; i < text.length(); ++i) {
@@ -154,6 +145,16 @@ public class MainActivity extends Activity implements KeyboardHeightObserver {
                     }
                 }
             }
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                // TODO Auto-generated method stub
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
         });
     }
 
@@ -162,29 +163,25 @@ public class MainActivity extends Activity implements KeyboardHeightObserver {
             return;
 
         try {
-            Thread.sleep(200);
+            Thread.sleep(250);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
 
         String temp = predictions[0] + ";" + predictions[1] + ";" + predictions[2];
+        predictions[0] = "";
+        predictions[1] = "";
+        predictions[2] = "";
 
         runOnUiThread(() -> {
             TextView tw = findViewById(R.id.textView);
-            EditText textEdit = findViewById(R.id.editText);
-
             tw.setText(temp);
-
-            predictions[0] = "";
-            predictions[1] = "";
-            predictions[2] = "";
-
-            textEdit.setText("");
         });
 
         if (Connection.getInstance().isConnected() && isKeyboardOpened) {
             new Thread(() -> {
                 Connection.getInstance().sendData(temp);
+                clearEditText();
             }).start();
         } else
             Toast.makeText(MainActivity.this,
