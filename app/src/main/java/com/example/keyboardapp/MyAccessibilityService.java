@@ -29,6 +29,8 @@ public class MyAccessibilityService extends AccessibilityService {
 
     long predictionsClickedTime;
 
+    volatile boolean WaitDrawEnd = false;
+
     @Override
     public void onInterrupt() {
 
@@ -96,6 +98,7 @@ public class MyAccessibilityService extends AccessibilityService {
                             mainActivity.sendScreenshot();
                         } else {
                             Log.i("Accessibility", "draw case enter . . .");
+
                             while(WaitDrawEnd);
                             drawGesture(receivedData);
                         }
@@ -127,7 +130,6 @@ public class MyAccessibilityService extends AccessibilityService {
         }
     }
 
-    boolean WaitDrawEnd = false;
 
     public void drawGesture(String[] data) {
         Log.i("Accessibility", "Start Drawing ...");
@@ -154,16 +156,18 @@ public class MyAccessibilityService extends AccessibilityService {
             }
             GestureDescription.Builder gestureBuilder = new GestureDescription.Builder();
             gestureBuilder.addStroke(new GestureDescription.StrokeDescription(clickPath, 0, gestureData.size() * TIME_CONSTANT));
-            WaitDrawEnd = true;
             dispatchGesture(gestureBuilder.build(), new GestureResultCallback() {
                 @Override
                 public void onCompleted(GestureDescription gestureDescription) {
                     super.onCompleted(gestureDescription);
+                    if(!gestureDescription.getStroke(0).getPath().isEmpty())
+                        WaitDrawEnd = true;
                 }
 
                 @Override
                 public void onCancelled(GestureDescription gestureDescription) {
                     super.onCancelled(gestureDescription);
+                    WaitDrawEnd = false;
                 }
             }, null);
         }

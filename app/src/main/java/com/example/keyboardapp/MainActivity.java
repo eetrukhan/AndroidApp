@@ -47,6 +47,7 @@ public class MainActivity extends Activity implements KeyboardHeightObserver {
     String[] predictions = {"", "", ""};
     long start;
 
+    Thread sendThread;
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -80,14 +81,7 @@ public class MainActivity extends Activity implements KeyboardHeightObserver {
             e.setClickable(true);
         });
 
-        Button buttonDev = findViewById(R.id.buttonDev);
-        buttonDev.setOnClickListener((e) -> {
-            e.setClickable(false);
-            Log.i("Window Tree (Child count)", Integer.toString(
-                    AccessibilityWindowInfo.obtain().describeContents()));
-            //Log.i("Window Tree (Root)",AccessibilityWindowInfo.obtain().getChild(0).toString());
-            e.setClickable(true);
-        });
+        
     }
 
     public void clearEditText() {
@@ -179,10 +173,11 @@ public class MainActivity extends Activity implements KeyboardHeightObserver {
         });
 
         if (Connection.getInstance().isConnected() && isKeyboardOpened) {
-            new Thread(() -> {
+            sendThread =  new Thread(() -> {
                 Connection.getInstance().sendData(temp);
                 clearEditText();
-            }).start();
+            });
+            sendThread.start();
         } else
             Toast.makeText(MainActivity.this,
                     "Warning. No connection with server or reopen keyboard view",
