@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">KeyboardApp</string>
-    <string name="accessibility_service_label">AccessibilityService</string>
-    <string name="accessibility_service_description">AccessibilityServiceDescription</string>
+    <string name="accessibility_service_label">TextEntry</string>
+    <string name="accessibility_service_description">No description.</string>
     <string name="button">Start Service</string>
     <string name="buttonScreen">Take Screenshot</string>
     <string name="text">Text</string>
