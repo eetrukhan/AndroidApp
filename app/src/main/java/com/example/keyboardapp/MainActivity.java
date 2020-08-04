@@ -28,7 +28,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.BufferOverflowException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 
@@ -44,7 +46,7 @@ public class MainActivity extends Activity implements KeyboardHeightObserver {
     int tc_counter = 0;
     ArrayList<String> words = new ArrayList<String>();
 
-    String[] predictions = {"", "", ""};
+    List<String> predictions = Collections.synchronizedList(new ArrayList<>());
     long start;
 
     Thread sendThread;
@@ -61,6 +63,9 @@ public class MainActivity extends Activity implements KeyboardHeightObserver {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        predictions.add("");
+        predictions.add("");
+        predictions.add("");
 
         keyboardHeightProvider = new KeyboardHeightProvider(this);
 
@@ -81,13 +86,17 @@ public class MainActivity extends Activity implements KeyboardHeightObserver {
             e.setClickable(true);
         });
 
-        
+
     }
 
     public void clearEditText() {
         runOnUiThread(() -> {
             ((EditText) findViewById(R.id.editText)).setText("");
+            int curr = service.forceWaitStopCounter.get();
             service.WaitDrawEnd = false;
+            Log.i("Gesture", String.format("%d done",curr));
+
+            Log.i("service", "WaitDrawEnt = FALSE");
         });
     }
 
@@ -118,8 +127,8 @@ public class MainActivity extends Activity implements KeyboardHeightObserver {
 
                 ++tc_counter;
                 if (tc_counter == 1) {
-                    service.predictionsDoubleClick();
-                    predictions[1] = s.toString().toLowerCase();
+                    predictions.set(1, s.toString().toLowerCase());
+                    Log.i("MainActivity", "tc_counter == 1 == True");
                 } else if (s.length() == 0) {
                     tc_counter = 0;
                 } else {
@@ -132,17 +141,24 @@ public class MainActivity extends Activity implements KeyboardHeightObserver {
                         }
                     }
                     if (index != 0) {
-                        predictions[0] = text.substring(0, index).trim().toLowerCase();
-                        predictions[2] = text.substring(index).trim().toLowerCase();
+                        if(tc_counter != 3) {
+                            predictions.set(0, text.substring(0, index).trim().toLowerCase());
+                            predictions.set(2, text.substring(index).trim().toLowerCase());
+                        }
+                        else
+                        {
+                            predictions.set(0, "ОШИБКА");
+                            predictions.set(1, "ОШИБКА");
+                            predictions.set(2, "ОШИБКА");
+                        }
                     } else {
-                        predictions[0] = text.trim().toLowerCase();
+                        predictions.set(0, text.trim().toLowerCase());
                     }
                 }
             }
 
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                // TODO Auto-generated method stub
             }
 
             @Override
@@ -162,10 +178,10 @@ public class MainActivity extends Activity implements KeyboardHeightObserver {
             e.printStackTrace();
         }
 
-        String temp = predictions[0] + ";" + predictions[1] + ";" + predictions[2];
-        predictions[0] = "";
-        predictions[1] = "";
-        predictions[2] = "";
+        String temp = predictions.get(0) + ";" + predictions.get(1) + ";" + predictions.get(2);
+        predictions.set(0,"");
+        predictions.set(1,"");
+        predictions.set(2,"");
 
         runOnUiThread(() -> {
             TextView tw = findViewById(R.id.textView);
