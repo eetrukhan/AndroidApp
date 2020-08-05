@@ -50,6 +50,8 @@ public class MainActivity extends Activity implements KeyboardHeightObserver {
     long start;
 
     Thread sendThread;
+    boolean isPredictionValid;
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -94,7 +96,7 @@ public class MainActivity extends Activity implements KeyboardHeightObserver {
             ((EditText) findViewById(R.id.editText)).setText("");
             int curr = service.forceWaitStopCounter.get();
             service.WaitDrawEnd = false;
-            Log.i("Gesture", String.format("%d done",curr));
+            Log.i("Gesture", String.format("%d done", curr));
 
             Log.i("service", "WaitDrawEnt = FALSE");
         });
@@ -119,19 +121,26 @@ public class MainActivity extends Activity implements KeyboardHeightObserver {
         textEdit.addTextChangedListener(new TextWatcher() {
             @Override
             public void afterTextChanged(Editable s) {
+                Log.i("Text Changed", String.format("COUNT:%d TEXT:%s", tc_counter, s.toString()));
 
                 if (service == null) {
                     Log.i("Double Tap Prediction", "Accessibility not enabled.");
                     return;
                 }
 
-                ++tc_counter;
-                if (tc_counter == 1) {
-                    predictions.set(1, s.toString().toLowerCase());
-                    Log.i("MainActivity", "tc_counter == 1 == True");
-                } else if (s.length() == 0) {
+
+                if (s.length() == 0) {
                     tc_counter = 0;
-                } else {
+                }
+                else if (tc_counter == 1) {
+                    predictions.set(1, s.toString().toLowerCase());
+                    isPredictionValid = true;
+                }
+                else if (tc_counter == 2 && predictions.get(1).equals(s.toString().trim().toLowerCase()))
+                {
+                    isPredictionValid = false;
+                }
+                else {
                     String text = s.toString();
                     int index = 0;
                     for (int i = 1; i < text.length(); ++i) {
@@ -141,16 +150,8 @@ public class MainActivity extends Activity implements KeyboardHeightObserver {
                         }
                     }
                     if (index != 0) {
-                        if(tc_counter != 3) {
-                            predictions.set(0, text.substring(0, index).trim().toLowerCase());
-                            predictions.set(2, text.substring(index).trim().toLowerCase());
-                        }
-                        else
-                        {
-                            predictions.set(0, "ОШИБКА");
-                            predictions.set(1, "ОШИБКА");
-                            predictions.set(2, "ОШИБКА");
-                        }
+                        predictions.set(0, text.substring(0, index).trim().toLowerCase());
+                        predictions.set(2, text.substring(index).trim().toLowerCase());
                     } else {
                         predictions.set(0, text.trim().toLowerCase());
                     }
@@ -163,7 +164,7 @@ public class MainActivity extends Activity implements KeyboardHeightObserver {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-
+                ++tc_counter;
             }
         });
     }
@@ -178,19 +179,25 @@ public class MainActivity extends Activity implements KeyboardHeightObserver {
             e.printStackTrace();
         }
 
+
+
         String temp = predictions.get(0) + ";" + predictions.get(1) + ";" + predictions.get(2);
-        predictions.set(0,"");
-        predictions.set(1,"");
-        predictions.set(2,"");
+
+
+
+        predictions.set(0, "");
+        predictions.set(1, "");
+        predictions.set(2, "");
 
         runOnUiThread(() -> {
+
             TextView tw = findViewById(R.id.textView);
-            tw.setText(temp);
+            tw.setText(isPredictionValid ? temp : "ОШИБКА;ОШИБКА;ОШИБКА");
         });
 
         if (Connection.getInstance().isConnected() && isKeyboardOpened) {
-            sendThread =  new Thread(() -> {
-                Connection.getInstance().sendData(temp);
+            sendThread = new Thread(() -> {
+                Connection.getInstance().sendData(isPredictionValid ? temp : "ОШИБКА;ОШИБКА;ОШИБКА");
                 clearEditText();
             });
             sendThread.start();
