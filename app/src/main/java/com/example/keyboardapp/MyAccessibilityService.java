@@ -193,7 +193,7 @@ public class MyAccessibilityService extends AccessibilityService {
             if (fixed_data.get(i) < 0 || fixed_data.get(i) > KeyboardHeightProvider.width || fixed_data.get(i + 1) < 0 || fixed_data.get(i + 1) > KeyboardHeightProvider.height ||
                    // (fixed_data.get(i + 1) > (KeyboardHeightProvider.height - KeyboardHeightProvider.keyboard_height * 0.20875) && (fixed_data.get(i) < KeyboardHeightProvider.width * 0.31 || fixed_data.get(i) > KeyboardHeightProvider.width * 0.745))) {
                     (fixed_data.get(i + 1) > (KeyboardHeightProvider.height - KeyboardHeightProvider.keyboard_height * 0.20875))||
-                    (fixed_data.get(i)>KeyboardHeightProvider.width*0.902 && fixed_data.get(i+1)>KeyboardHeightProvider.height - KeyboardHeightProvider.keyboard_height*0.4175 )) { // Backspace
+                    ((fixed_data.get(i)<KeyboardHeightProvider.width*0.1||fixed_data.get(i)>KeyboardHeightProvider.width*0.9) && fixed_data.get(i+1)>KeyboardHeightProvider.height - KeyboardHeightProvider.keyboard_height*0.4170 )) { // Backspace
                     fixed_data.remove(i + 1);
                 fixed_data.remove(i);
             } else
