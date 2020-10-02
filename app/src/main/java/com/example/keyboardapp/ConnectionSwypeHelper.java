@@ -114,4 +114,26 @@ class ConnectionSwypeHelper {
             Log.i(LOG_TAG, e.getMessage() == null ? "Can't send: " + data : e.getMessage());
         }
     }
+
+    String[] receiveData() {
+        if (!isConnected)
+            return null;
+
+        Log.i(LOG_TAG, "Waiting for gestures . . .");
+
+        try {
+            String data = in.readLine();
+            if (data == null)
+                throw new IOException("Disconnected from server");
+
+            Log.i("received from helper", data);
+            Log.d(LOG_TAG, data);
+            MyAccessibilityService.mainActivity.service.predictionsDoubleClick();
+            return data.split(";");
+        } catch (IOException e) {
+            isConnected = false;
+            Log.i(LOG_TAG, e.getMessage() == null ? "Can't receive data from server." : e.getMessage());
+            return null;
+        }
+    }
 }
