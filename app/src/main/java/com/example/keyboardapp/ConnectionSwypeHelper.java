@@ -14,14 +14,14 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.Socket;
 
-class Connection {
+class ConnectionSwypeHelper {
     private final String LOG_TAG = "Connection";
-    private static Connection Instance;
+    private static ConnectionSwypeHelper Instance;
 
 
     private Socket mSocket = null;
     private int mPort = 1488;
-    private Broadcast broadcast = new Broadcast(9876);
+    private Broadcast broadcast = new Broadcast(9875);
 
     private volatile BufferedReader in;
     private volatile OutputStreamWriter out;
@@ -30,7 +30,7 @@ class Connection {
 
     private volatile boolean doConnect = true;
 
-    private Connection(final int port) {
+    private ConnectionSwypeHelper(final int port) {
         this.mPort = port;
     }
 
@@ -42,9 +42,9 @@ class Connection {
         doConnect = false;
     }
 
-    static Connection getInstance() {
+    static ConnectionSwypeHelper getInstance() {
         if (Instance == null)
-            Instance = new Connection(1488);
+            Instance = new ConnectionSwypeHelper(1228);
         return Instance;
     }
 
@@ -114,60 +114,4 @@ class Connection {
             Log.i(LOG_TAG, e.getMessage() == null ? "Can't send: " + data : e.getMessage());
         }
     }
-
-    void sendFile(File file) {
-        FileInputStream fis = null;
-        BufferedInputStream bis = null;
-
-        if (!isConnected)
-            return;
-
-        try {
-
-            out.write("file " + file.length() + "\r\n");
-            out.flush();
-
-            DataOutputStream outFile =
-                    new DataOutputStream(new BufferedOutputStream(mSocket.getOutputStream()));
-            long length = file.length();
-            byte[] bytes = new byte[(int) length];
-            fis = new FileInputStream(file);
-            bis = new BufferedInputStream(fis);
-            bis.read(bytes, 0, bytes.length);
-            outFile.write(bytes, 0, bytes.length);
-            outFile.flush();
-            Log.i(LOG_TAG, "File has been sent. " + bytes.length + " bytes.");
-
-            file.delete();
-        } catch (IOException e) {
-            isConnected = false;
-            Log.i(LOG_TAG, "Can't send file");
-            Log.i(LOG_TAG, e.getMessage() == null ? "Can't send file" : e.getMessage());
-        }
-    }
-
-
-    String[] receiveData() {
-        if (!isConnected)
-            return null;
-
-        Log.i(LOG_TAG, "Waiting for gestures . . .");
-
-        try {
-            String data = in.readLine();
-
-            if (data == null)
-                throw new IOException("Disconnected from server");
-
-            Log.d(LOG_TAG, data);
-            ConnectionSwypeHelper.getInstance().sendData(data);
-
-            return data.split(";");
-        } catch (IOException e) {
-            isConnected = false;
-            Log.i(LOG_TAG, e.getMessage() == null ? "Can't receive data from server." : e.getMessage());
-            return null;
-        }
-    }
-
 }

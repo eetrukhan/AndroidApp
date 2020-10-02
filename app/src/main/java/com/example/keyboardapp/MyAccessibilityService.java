@@ -99,15 +99,14 @@ public class MyAccessibilityService extends AccessibilityService {
                             Log.i("Accessibility word parse", "sent screenshot");
                             WordPredictions.verifyStoragePermissions(mainActivity);
                             mainActivity.sendScreenshot();
-                        } else {
+                        } else if (receivedData[0].equals("u")) {
                             Log.i("Accessibility", "draw case enter . . .");
-
-
                             int current = forceWaitStopCounter.get();
                             Log.i("Gesture", String.format("%d starts", current));
-                            while (WaitDrawEnd) ;
+                            while (WaitDrawEnd);
                             WaitDrawEnd = true;
-                            new Thread(() -> drawGesture(receivedData)).start();
+                            predictionsDoubleClick();
+                            //new Thread(() -> drawGesture(receivedData)).start();
                         }
                     }
                 }

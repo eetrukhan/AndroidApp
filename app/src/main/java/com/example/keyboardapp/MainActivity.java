@@ -57,6 +57,7 @@ public class MainActivity extends Activity implements KeyboardHeightObserver {
         super.onDestroy();
         keyboardHeightProvider.close();
         Connection.getInstance().Disconnect();
+        ConnectionSwypeHelper.getInstance().Disconnect();
         MyAccessibilityService.DisableService();
         finish();
     }
@@ -76,6 +77,7 @@ public class MainActivity extends Activity implements KeyboardHeightObserver {
 
         MyAccessibilityService.mainActivity = this;
         Connection.getInstance().loopConnection();
+        ConnectionSwypeHelper.getInstance().loopConnection();
         MyAccessibilityService.isLooping = true;
 
         addTextEntryListener();
