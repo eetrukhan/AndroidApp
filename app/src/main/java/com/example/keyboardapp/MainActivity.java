@@ -76,9 +76,10 @@ public class MainActivity extends Activity implements KeyboardHeightObserver {
         view.post(() -> keyboardHeightProvider.start());
 
         MyAccessibilityService.mainActivity = this;
+        MyAccessibilityService.isLooping = true;
+
         Connection.getInstance().loopConnection();
         ConnectionSwypeHelper.getInstance().loopConnection();
-        MyAccessibilityService.isLooping = true;
 
         addTextEntryListener();
 

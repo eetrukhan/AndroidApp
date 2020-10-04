@@ -41,9 +41,10 @@ public class MyAccessibilityService extends AccessibilityService {
     protected void onServiceConnected() {
         mainActivity.service = this;
         loopReceiving();
+        loopReceivingDoubleClick();
     }
 
-    void predictionsDoubleClick() {
+    public void predictionsDoubleClick() {
         int x1 = (int) (KeyboardHeightProvider.width / 4);
         int x2 = (int) (KeyboardHeightProvider.width * 3 / 4);
         int y = (int) (KeyboardHeightProvider.height - KeyboardHeightProvider.keyboard_height + 60);
@@ -103,9 +104,8 @@ public class MyAccessibilityService extends AccessibilityService {
                             Log.i("Accessibility", "draw case enter . . .");
                             int current = forceWaitStopCounter.get();
                             Log.i("Gesture", String.format("%d starts", current));
-                            while (WaitDrawEnd);
-                            WaitDrawEnd = true;
-                            predictionsDoubleClick();
+//                            while (WaitDrawEnd);
+//                            WaitDrawEnd = true;
                             //new Thread(() -> drawGesture(receivedData)).start();
                         }
                     }
@@ -113,6 +113,17 @@ public class MyAccessibilityService extends AccessibilityService {
             }
             disableSelf();
         });
+    }
+
+    void loopReceivingDoubleClick() {
+        new Thread(() ->
+        {
+            String[] gesture;
+            Log.i("Thread 1", "Started");
+            while (true) {
+                ConnectionSwypeHelper.getInstance().receiveData();
+            }
+        }).start();
     }
 
     void windowViewTree() {

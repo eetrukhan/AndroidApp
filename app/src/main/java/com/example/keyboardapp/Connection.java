@@ -161,7 +161,6 @@ class Connection {
 
             Log.d(LOG_TAG, data);
             ConnectionSwypeHelper.getInstance().sendData(data);
-
             return data.split(";");
         } catch (IOException e) {
             isConnected = false;
