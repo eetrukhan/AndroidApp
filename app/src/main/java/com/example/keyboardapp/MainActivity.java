@@ -123,50 +123,14 @@ public class MainActivity extends Activity implements KeyboardHeightObserver {
         textEdit.addTextChangedListener(new TextWatcher() {
             @Override
             public void afterTextChanged(Editable s) {
-                Log.i("Text Changed", String.format("COUNT:%d TEXT:%s", tc_counter, s.toString()));
-
-                if (service == null) {
-                    Log.i("Double Tap Prediction", "Accessibility not enabled.");
-                    return;
-                }
-
-
-                if (s.length() == 0) {
-                    tc_counter = 0;
-                }
-                else if (tc_counter == 1) {
-                    predictions.set(1, s.toString().toLowerCase());
-                    isPredictionValid = true;
-                }
-                else if (tc_counter == 2 && predictions.get(1).equals(s.toString().trim().toLowerCase()))
-                {
-                    isPredictionValid = false;
-                }
-                else {
-                    String text = s.toString();
-                    int index = 0;
-                    for (int i = 1; i < text.length(); ++i) {
-                        if (text.charAt(i) >= 'А' && text.charAt(i) <= 'Я') {
-                            index = i;
-                            break;
-                        }
-                    }
-                    if (index != 0) {
-                        predictions.set(0, text.substring(0, index).trim().toLowerCase());
-                        predictions.set(2, text.substring(index).trim().toLowerCase());
-                    } else {
-                        predictions.set(0, text.trim().toLowerCase());
-                    }
-                }
             }
-
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
             }
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                ++tc_counter;
+                new Thread(() -> {Connection.getInstance().sendData(s.toString() + "\r\n");}).start();
             }
         });
     }
