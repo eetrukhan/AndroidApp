@@ -128,7 +128,7 @@ class ConnectionSwypeHelper {
 
             Log.i("received from helper", data);
             Log.d(LOG_TAG, data);
-            MyAccessibilityService.mainActivity.service.predictionsDoubleClick();
+            //MyAccessibilityService.mainActivity.service.predictionsDoubleClick();
             return data.split(";");
         } catch (IOException e) {
             isConnected = false;

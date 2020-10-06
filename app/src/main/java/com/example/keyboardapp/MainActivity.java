@@ -131,7 +131,7 @@ public class MainActivity extends Activity implements KeyboardHeightObserver {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                new Thread(() -> {Connection.getInstance().sendData(s.toString() + "\r\n");}).start();
+                new Thread(() -> {Connection.getInstance().sendData(s.toString() + "#");}).start();
             }
         });
     }

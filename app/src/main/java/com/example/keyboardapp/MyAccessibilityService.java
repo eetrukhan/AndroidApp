@@ -104,8 +104,6 @@ public class MyAccessibilityService extends AccessibilityService {
                             Log.i("Accessibility", "draw case enter . . .");
                             int current = forceWaitStopCounter.get();
                             Log.i("Gesture", String.format("%d starts", current));
-//                            while (WaitDrawEnd);
-//                            WaitDrawEnd = true;
                             //new Thread(() -> drawGesture(receivedData)).start();
                         }
                     }
