@@ -41,7 +41,7 @@ public class MainActivity extends Activity implements KeyboardHeightObserver {
     private WordPredictions wordPredictions = new WordPredictions();
 
     private boolean isKeyboardOpened = false;
-    MyAccessibilityService service;
+    MyAccessibilityService service = new MyAccessibilityService();
 
     int tc_counter = 0;
     ArrayList<String> words = new ArrayList<String>();
@@ -91,7 +91,7 @@ public class MainActivity extends Activity implements KeyboardHeightObserver {
             e.setClickable(true);
         });
 
-
+        service.onServiceConnected();
     }
 
     public void clearEditText() {

@@ -14,7 +14,7 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class MyAccessibilityService extends AccessibilityService {
+public class MyAccessibilityService{
     public static MainActivity mainActivity;
 
     public static volatile boolean isLooping = true;
@@ -32,53 +32,52 @@ public class MyAccessibilityService extends AccessibilityService {
     volatile boolean WaitDrawEnd = false;
     AtomicInteger forceWaitStopCounter = new AtomicInteger(0);
 
-    @Override
+
     public void onInterrupt() {
 
     }
 
-    @Override
-    protected void onServiceConnected() {
-        mainActivity.service = this;
+
+    public void onServiceConnected() {
         loopReceiving();
         loopReceivingDoubleClick();
     }
 
-    public void predictionsDoubleClick() {
-        int x1 = (int) (KeyboardHeightProvider.width / 4);
-        int x2 = (int) (KeyboardHeightProvider.width * 3 / 4);
-        int y = (int) (KeyboardHeightProvider.height - KeyboardHeightProvider.keyboard_height + 60);
-        Log.i("Double click", "Enter Method");
-        Path clickPath1 = new Path();
-        clickPath1.moveTo(x1, y);
-        GestureDescription.StrokeDescription clickStroke1 = new GestureDescription.StrokeDescription(clickPath1, 50, 50);
-
-
-        Path clickPath3 = new Path();
-        clickPath3.moveTo(x2, y);
-        GestureDescription.StrokeDescription clickStroke3 = new GestureDescription.StrokeDescription(clickPath3, 50, 50);
-        GestureDescription.Builder clickBuilder3 = new GestureDescription.Builder();
-        clickBuilder3.addStroke(clickStroke3);
-        clickBuilder3.addStroke(clickStroke1);
-
-        dispatchGesture(clickBuilder3.build(), new GestureResultCallback() {
-            @Override
-            public void onCompleted(GestureDescription gestureDescription) {
-                super.onCompleted(gestureDescription);
-                new Thread(() -> mainActivity.sendPredictions()).start();
-                Log.i("Double click", "Completed Gesture");
-            }
-
-            @Override
-            public void onCancelled(GestureDescription gestureDescription) {
-                super.onCancelled(gestureDescription);
-                Log.i("Double click", "Canceled Gesture");
-                WaitDrawEnd = false;
-            }
-        }, null);
-
-
-    }
+//    public void predictionsDoubleClick() {
+//        int x1 = (int) (KeyboardHeightProvider.width / 4);
+//        int x2 = (int) (KeyboardHeightProvider.width * 3 / 4);
+//        int y = (int) (KeyboardHeightProvider.height - KeyboardHeightProvider.keyboard_height + 60);
+//        Log.i("Double click", "Enter Method");
+//        Path clickPath1 = new Path();
+//        clickPath1.moveTo(x1, y);
+//        GestureDescription.StrokeDescription clickStroke1 = new GestureDescription.StrokeDescription(clickPath1, 50, 50);
+//
+//
+//        Path clickPath3 = new Path();
+//        clickPath3.moveTo(x2, y);
+//        GestureDescription.StrokeDescription clickStroke3 = new GestureDescription.StrokeDescription(clickPath3, 50, 50);
+//        GestureDescription.Builder clickBuilder3 = new GestureDescription.Builder();
+//        clickBuilder3.addStroke(clickStroke3);
+//        clickBuilder3.addStroke(clickStroke1);
+//
+//        dispatchGesture(clickBuilder3.build(), new GestureResultCallback() {
+//            @Override
+//            public void onCompleted(GestureDescription gestureDescription) {
+//                super.onCompleted(gestureDescription);
+//                new Thread(() -> mainActivity.sendPredictions()).start();
+//                Log.i("Double click", "Completed Gesture");
+//            }
+//
+//            @Override
+//            public void onCancelled(GestureDescription gestureDescription) {
+//                super.onCancelled(gestureDescription);
+//                Log.i("Double click", "Canceled Gesture");
+//                WaitDrawEnd = false;
+//            }
+//        }, null);
+//
+//
+//    }
 
 
     void loopReceiving() {
@@ -109,7 +108,7 @@ public class MyAccessibilityService extends AccessibilityService {
                     }
                 }
             }
-            disableSelf();
+            //disableSelf();
         });
     }
 
@@ -124,66 +123,57 @@ public class MyAccessibilityService extends AccessibilityService {
         }).start();
     }
 
-    void windowViewTree() {
-        AccessibilityWindowInfo wInfo = AccessibilityWindowInfo.obtain();
-
-        wInfo.describeContents();
 
 
-    }
-
-    @Override
-    public void onAccessibilityEvent(AccessibilityEvent event) {
-    }
 
 
-    public void drawGesture(String[] data) {
-        Log.i("Accessibility", "Start Drawing ...");
-
-        if (data == null || data.length < 2) {
-            Log.i("Accessibility", "Empty (x,y) array.");
-            WaitDrawEnd = false;
-            return;
-        }
-        ArrayList<Float> gestureData;
-
-        gestureData = fixGesture(data);
-
-        Path clickPath = new Path();
-
-        if (gestureData.size() != 0) {
-            clickPath.moveTo(
-                    gestureData.get(0),
-                    gestureData.get(1));
-
-            for (int i = 2; i < gestureData.size() - 1; i += 2) {
-                clickPath.lineTo(
-                        gestureData.get(i),
-                        gestureData.get(i + 1));
-            }
-
-            int gestureMicros = Math.max(gestureData.size() * TIME_CONSTANT, 150);
-
-            GestureDescription.Builder gestureBuilder = new GestureDescription.Builder();
-            gestureBuilder.addStroke(new GestureDescription.StrokeDescription(clickPath, 0, gestureMicros));
-            dispatchGesture(gestureBuilder.build(), new GestureResultCallback() {
-                @Override
-                public void onCompleted(GestureDescription gestureDescription) {
-                    super.onCompleted(gestureDescription);
-                    predictionsDoubleClick();
-                }
-
-                @Override
-                public void onCancelled(GestureDescription gestureDescription) {
-                    super.onCancelled(gestureDescription);
-                    WaitDrawEnd = false;
-                }
-            }, null);
-        } else {
-            WaitDrawEnd = false;
-        }
-        Log.i("Accessibility", "Successful drawn.");
-    }
+//    public void drawGesture(String[] data) {
+//        Log.i("Accessibility", "Start Drawing ...");
+//
+//        if (data == null || data.length < 2) {
+//            Log.i("Accessibility", "Empty (x,y) array.");
+//            WaitDrawEnd = false;
+//            return;
+//        }
+//        ArrayList<Float> gestureData;
+//
+//        gestureData = fixGesture(data);
+//
+//        Path clickPath = new Path();
+//
+//        if (gestureData.size() != 0) {
+//            clickPath.moveTo(
+//                    gestureData.get(0),
+//                    gestureData.get(1));
+//
+//            for (int i = 2; i < gestureData.size() - 1; i += 2) {
+//                clickPath.lineTo(
+//                        gestureData.get(i),
+//                        gestureData.get(i + 1));
+//            }
+//
+//            int gestureMicros = Math.max(gestureData.size() * TIME_CONSTANT, 150);
+//
+//            GestureDescription.Builder gestureBuilder = new GestureDescription.Builder();
+//            gestureBuilder.addStroke(new GestureDescription.StrokeDescription(clickPath, 0, gestureMicros));
+//            dispatchGesture(gestureBuilder.build(), new GestureResultCallback() {
+//                @Override
+//                public void onCompleted(GestureDescription gestureDescription) {
+//                    super.onCompleted(gestureDescription);
+//                    predictionsDoubleClick();
+//                }
+//
+//                @Override
+//                public void onCancelled(GestureDescription gestureDescription) {
+//                    super.onCancelled(gestureDescription);
+//                    WaitDrawEnd = false;
+//                }
+//            }, null);
+//        } else {
+//            WaitDrawEnd = false;
+//        }
+//        Log.i("Accessibility", "Successful drawn.");
+//    }
 
     public ArrayList<Float> fixGesture(String[] data) {
         ArrayList<Float> fixed_data = new ArrayList<Float>();
