@@ -8,6 +8,7 @@ import android.os.Debug;
 import android.os.Environment;
 import android.provider.Settings;
 import android.text.Editable;
+import android.text.SpannableStringBuilder;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
@@ -105,6 +106,20 @@ public class MainActivity extends Activity implements KeyboardHeightObserver {
         });
     }
 
+    public void backspace() {
+        runOnUiThread(() -> {
+            EditText et = findViewById(R.id.editText);
+            Editable res;
+
+            int i =  et.getText().length() - 1;
+            while (i >= 0 &&  et.getText().charAt(i) != ' ')
+                --i;
+            res = et.getText().delete(i + 1,  et.getText().length());
+            
+            et.setText(res.toString());
+        });
+    }
+
     public void sendScreenshot() {
         if (Connection.getInstance().isConnected() && isKeyboardOpened) {
             WordPredictions.verifyStoragePermissions(MainActivity.this);
@@ -125,13 +140,16 @@ public class MainActivity extends Activity implements KeyboardHeightObserver {
             @Override
             public void afterTextChanged(Editable s) {
             }
+
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
             }
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                new Thread(() -> {Connection.getInstance().sendData(s.toString() + "#");}).start();
+                new Thread(() -> {
+                    Connection.getInstance().sendData(s.toString() + "#");
+                }).start();
             }
         });
     }
@@ -147,9 +165,7 @@ public class MainActivity extends Activity implements KeyboardHeightObserver {
         }
 
 
-
         String temp = predictions.get(0) + ";" + predictions.get(1) + ";" + predictions.get(2);
-
 
 
         predictions.set(0, "");

@@ -92,18 +92,25 @@ public class MyAccessibilityService{
                             receivedData.length > 0) {
                         Log.i("Accessibility", "choose case enter . . .");
 
-                        if (receivedData[0].equals("clear")) {
-                            Log.i("Accessibility", "clear case enter . . .");
-                            mainActivity.clearEditText();
-                        } else if (receivedData[0].equals("screenshot")) {
-                            Log.i("Accessibility word parse", "sent screenshot");
-                            WordPredictions.verifyStoragePermissions(mainActivity);
-                            mainActivity.sendScreenshot();
-                        } else if (receivedData[0].equals("u")) {
-                            Log.i("Accessibility", "draw case enter . . .");
-                            int current = forceWaitStopCounter.get();
-                            Log.i("Gesture", String.format("%d starts", current));
-                            //new Thread(() -> drawGesture(receivedData)).start();
+                        switch (receivedData[0]) {
+                            case "clear":
+                                Log.i("Accessibility", "clear case enter . . .");
+                                mainActivity.clearEditText();
+                                break;
+                            case "screenshot":
+                                Log.i("Accessibility word parse", "sent screenshot");
+                                WordPredictions.verifyStoragePermissions(mainActivity);
+                                mainActivity.sendScreenshot();
+                                break;
+                            case "u":
+                                Log.i("Accessibility", "draw case enter . . .");
+                                int current = forceWaitStopCounter.get();
+                                Log.i("Gesture", String.format("%d starts", current));
+                                //new Thread(() -> drawGesture(receivedData)).start();
+                                break;
+                            case "backspace":
+                                mainActivity.backspace();
+                                break;
                         }
                     }
                 }
