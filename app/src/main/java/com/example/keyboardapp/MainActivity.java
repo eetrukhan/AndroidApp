@@ -111,12 +111,25 @@ public class MainActivity extends Activity implements KeyboardHeightObserver {
             EditText et = findViewById(R.id.editText);
             Editable res;
 
-            int i =  et.getText().length() - 1;
-            while (i >= 0 &&  et.getText().charAt(i) != ' ')
+            int i = et.getText().length() - 1;
+
+            if(i == -1)
+                return;
+            if(et.getText().charAt(i) == ' ')
                 --i;
-            res = et.getText().delete(i + 1,  et.getText().length());
-            
+
+            while (i >= 0 && et.getText().charAt(i) != ' ')
+                --i;
+            res = et.getText().delete(i + 1, et.getText().length());
+
             et.setText(res.toString());
+
+            et.setSelection(et.getText().length());
+
+            new Thread(() -> {
+                Connection.getInstance().sendData(et.getText().toString() + "#");
+            }).start();
+
         });
     }
 
