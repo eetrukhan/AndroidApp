@@ -87,8 +87,9 @@ public class MainActivity extends Activity implements KeyboardHeightObserver {
         Button button = findViewById(R.id.button);
         button.setOnClickListener((e) -> {
             e.setClickable(false);
-            Intent intent = new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS);
-            startActivity(intent);
+            new Thread(() -> {
+                Connection.getInstance().sendData("restart#");
+            }).start();
             e.setClickable(true);
         });
 
