@@ -186,11 +186,7 @@ public class MainActivity extends Activity implements KeyboardHeightObserver {
         predictions.set(1, "");
         predictions.set(2, "");
 
-        runOnUiThread(() -> {
-
-            TextView tw = findViewById(R.id.textView);
-            tw.setText(isPredictionValid ? temp : "ОШИБКА;ОШИБКА;ОШИБКА");
-        });
+       
 
         if (Connection.getInstance().isConnected() && isKeyboardOpened) {
             sendThread = new Thread(() -> {
