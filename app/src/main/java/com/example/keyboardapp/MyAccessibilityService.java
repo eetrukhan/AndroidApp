@@ -98,7 +98,7 @@ public class MyAccessibilityService{
                                 mainActivity.clearEditText();
                                 break;
                             case "screenshot":
-                                Log.i("Accessibility word parse", "sent screenshot");
+                                Log.i("Accessibility word pars", "sent screenshot");
                                 WordPredictions.verifyStoragePermissions(mainActivity);
                                 mainActivity.sendScreenshot();
                                 break;

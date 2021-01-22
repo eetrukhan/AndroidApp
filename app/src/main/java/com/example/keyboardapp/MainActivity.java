@@ -2,6 +2,7 @@ package com.example.keyboardapp;
 
 
 import android.app.Activity;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Debug;
@@ -11,6 +12,8 @@ import android.text.Editable;
 import android.text.SpannableStringBuilder;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.accessibility.AccessibilityWindowInfo;
 import android.widget.Button;
@@ -21,6 +24,10 @@ import android.os.Bundle;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -35,7 +42,7 @@ import java.util.List;
 import java.util.Locale;
 
 
-public class MainActivity extends Activity implements KeyboardHeightObserver {
+public class MainActivity extends AppCompatActivity implements KeyboardHeightObserver {
     private final static String LOG_TAG = "Main Activity";
 
     private KeyboardHeightProvider keyboardHeightProvider;
@@ -84,16 +91,90 @@ public class MainActivity extends Activity implements KeyboardHeightObserver {
 
         addTextEntryListener();
 
-        Button button = findViewById(R.id.button);
-        button.setOnClickListener((e) -> {
-            e.setClickable(false);
-            new Thread(() -> {
-                Connection.getInstance().sendData("restart#");
-            }).start();
-            e.setClickable(true);
-        });
-
         service.onServiceConnected();
+
+        Toolbar myToolbar = (Toolbar) findViewById(R.id.my_toolbar);
+        setSupportActionBar(myToolbar);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.main_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle item selection
+        switch (item.getItemId()) {
+            case R.id.ABCD:
+                Log.d("MENU", "selected switch ABCD");
+//                new Thread(() -> {
+//                    Connection.getInstance().sendData("switchGET#");
+//                }).start();
+                return true;
+            case R.id.scale_A:
+                Log.d("MENU", "selected A");
+                new Thread(() -> {
+                    Connection.getInstance().sendData("switchA#");
+                }).start();
+                return true;
+            case R.id.scale_B:
+                Log.d("MENU", "selected B");
+                new Thread(() -> {
+                    Connection.getInstance().sendData("switchB#");
+                }).start();
+                return true;
+            case R.id.scale_C:
+                Log.d("MENU", "selected C");
+                new Thread(() -> {
+                    Connection.getInstance().sendData("switchC#");
+                }).start();
+                return true;
+            case R.id.scale_D:
+                Log.d("MENU", "selected D");
+                new Thread(() -> {
+                    Connection.getInstance().sendData("switchD#");
+                }).start();
+                return true;
+            case R.id.scale_Train:
+                Log.d("MENU", "selected Train");
+                new Thread(() -> {
+                    Connection.getInstance().sendData("switchTrain#");
+                }).start();
+                return true;
+            case R.id.Re_entry:
+                Log.d("MENU", "selected re-entry");
+                AlertAndSendToServer("Re-entry sentence",
+                        "Do you really want to re-entry attempt?",
+                        "restart#");
+                return true;
+            case R.id.Re_generate:
+                Log.d("MENU", "selected re-generate");
+                AlertAndSendToServer("Re-generate sentences",
+                        "Do you really want to re-generate dictionary?",
+                        "regenerate#");
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    public void AlertAndSendToServer(String Title, String Message, String Data)
+    {
+        new AlertDialog.Builder(this)
+                .setTitle(Title)
+                .setMessage(Message)
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        new Thread(() -> {
+                            Connection.getInstance().sendData(Data);
+                        }).start();
+                    }})
+                .setNegativeButton(android.R.string.no, null).show();
     }
 
     public void clearEditText() {
@@ -114,9 +195,9 @@ public class MainActivity extends Activity implements KeyboardHeightObserver {
 
             int i = et.getText().length() - 1;
 
-            if(i == -1)
+            if (i == -1)
                 return;
-            if(et.getText().charAt(i) == ' ')
+            if (et.getText().charAt(i) == ' ')
                 --i;
 
             while (i >= 0 && et.getText().charAt(i) != ' ')
@@ -166,38 +247,6 @@ public class MainActivity extends Activity implements KeyboardHeightObserver {
                 }).start();
             }
         });
-    }
-
-    public void sendPredictions() {
-        if (!Connection.getInstance().isConnected() || !isKeyboardOpened)
-            return;
-
-        try {
-            Thread.sleep(250);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-
-        String temp = predictions.get(0) + ";" + predictions.get(1) + ";" + predictions.get(2);
-
-
-        predictions.set(0, "");
-        predictions.set(1, "");
-        predictions.set(2, "");
-
-       
-
-        if (Connection.getInstance().isConnected() && isKeyboardOpened) {
-            sendThread = new Thread(() -> {
-                Connection.getInstance().sendData(isPredictionValid ? temp : "ОШИБКА;ОШИБКА;ОШИБКА");
-                clearEditText();
-            });
-            sendThread.start();
-        } else
-            Toast.makeText(MainActivity.this,
-                    "Warning. No connection with server or reopen keyboard view",
-                    Toast.LENGTH_SHORT).show();
     }
 
     @Override

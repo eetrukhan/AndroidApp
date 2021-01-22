@@ -4,7 +4,15 @@
     <string name="accessibility_service_description">No description.</string>
     <string name="button">RESTART SENTENCE</string>
     <string name="buttonScreen">Take Screenshot</string>
-    <string name="text">Text</string>
+    <string name="switch_ABCD">Switch ABCD</string>
+    <string name="zero">0</string>
+    <string name="A">A</string>
+    <string name="B">B</string>
+    <string name="C">C</string>
+    <string name="D">D</string>
+    <string name="Train">Train</string>
+    <string name="regenerate">Re-generate dictionary</string>
+    <string name="reentry">Re-entry sentence</string>
     <string name="info">CLick the back button to close the keyboard, click the EditText to open it again.</string>
     <string name="height">Keyboard height (pixels):</string>
 </resources>
