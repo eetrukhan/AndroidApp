@@ -5,6 +5,8 @@
     <string name="button">RESTART SENTENCE</string>
     <string name="buttonScreen">Take Screenshot</string>
     <string name="switch_ABCD">Switch ABCD</string>
+    <string name="Other">Other</string>
+    <string name="ah_referencing">AH - Torso referencing</string>
     <string name="zero">0</string>
     <string name="A">A</string>
     <string name="B">B</string>

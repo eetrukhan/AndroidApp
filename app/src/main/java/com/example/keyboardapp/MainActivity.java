@@ -157,6 +157,13 @@ public class MainActivity extends AppCompatActivity implements KeyboardHeightObs
                         "Do you really want to re-generate dictionary?",
                         "regenerate#");
                 return true;
+            case R.id.AH_Referencing:
+                Log.d("MENU", "selected AH_referencing");
+                new Thread(() -> {
+                    Connection.getInstance().sendData("TorsoReferencing#");
+                }).start();
+                return true;
+
             default:
                 return super.onOptionsItemSelected(item);
         }

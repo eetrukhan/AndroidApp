@@ -29,4 +29,13 @@
     <item
         android:id="@+id/Re_generate"
         android:title="@string/regenerate" />
+    <item
+        android:id="@+id/other"
+        android:title="@string/Other">
+        <menu>
+            <item
+                android:id="@+id/AH_Referencing"
+                android:title="@string/ah_referencing" />
+        </menu>
+    </item>
 </menu>
