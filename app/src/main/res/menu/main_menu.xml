@@ -29,6 +29,21 @@
     <item
         android:id="@+id/Re_generate"
         android:title="@string/regenerate" />
+
+
+    <item
+        android:id="@+id/Eye"
+        android:title="@string/eye_tracking">
+        <menu>
+            <item
+                android:id="@+id/Eye_Restart"
+                android:title="@string/restart_eye_tracking" />
+            <item
+                android:id="@+id/Eye_Stop"
+                android:title="@string/stop_tracking" />
+        </menu>
+    </item>
+
     <item
         android:id="@+id/other"
         android:title="@string/Other">
@@ -38,4 +53,7 @@
                 android:title="@string/ah_referencing" />
         </menu>
     </item>
+
+
+
 </menu>

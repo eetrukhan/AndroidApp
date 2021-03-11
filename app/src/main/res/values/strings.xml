@@ -17,4 +17,9 @@
     <string name="reentry">Re-entry sentence</string>
     <string name="info">CLick the back button to close the keyboard, click the EditText to open it again.</string>
     <string name="height">Keyboard height (pixels):</string>
+    <string name="restart_eye_tracking">Restart Eye Tracking</string>
+    <string name="eye_tracking">Eye Tracking</string>
+    <string name="_switch">Switch</string>
+    <string name="tracking_on">Tracking On</string>
+    <string name="stop_tracking">Stop Tracking</string>
 </resources>

@@ -163,6 +163,19 @@ public class MainActivity extends AppCompatActivity implements KeyboardHeightObs
                     Connection.getInstance().sendData("TorsoReferencing#");
                 }).start();
                 return true;
+            case R.id.Eye_Restart:
+                Log.d("MENU", "selected Eye_Restart");
+                new Thread(() -> {
+                    Connection.getInstance().sendData("RestartEye#");
+                }).start();
+                return true;
+            case R.id.Eye_Stop:
+                Log.d("MENU", "selected Eye_Restart");
+                new Thread(() -> {
+                    Connection.getInstance().sendData("StopEye#");
+                }).start();
+                return true;
+
 
             default:
                 return super.onOptionsItemSelected(item);
