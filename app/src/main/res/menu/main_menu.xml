@@ -27,11 +27,6 @@
         android:title="@string/reentry" />
 
     <item
-        android:id="@+id/Re_generate"
-        android:title="@string/regenerate" />
-
-
-    <item
         android:id="@+id/Eye"
         android:title="@string/eye_tracking">
         <menu>
@@ -51,6 +46,9 @@
             <item
                 android:id="@+id/AH_Referencing"
                 android:title="@string/ah_referencing" />
+            <item
+                android:id="@+id/Re_generate"
+                android:title="@string/regenerate" />
         </menu>
     </item>
 
