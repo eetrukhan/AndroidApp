@@ -175,7 +175,72 @@ public class MainActivity extends AppCompatActivity implements KeyboardHeightObs
                     Connection.getInstance().sendData("StopEye#");
                 }).start();
                 return true;
-
+            case R.id.sceneAH:
+                Log.d("MENU", "selected Eye_Restart");
+                new Thread(() -> {
+                    Connection.getInstance().sendData("sceneAH#");
+                }).start();
+                return true;
+            case R.id.sceneEG:
+                Log.d("MENU", "selected Eye_Restart");
+                new Thread(() -> {
+                    Connection.getInstance().sendData("sceneEG#");
+                }).start();
+                return true;
+            case R.id.sceneGT:
+                Log.d("MENU", "selected Eye_Restart");
+                new Thread(() -> {
+                    Connection.getInstance().sendData("sceneGT#");
+                }).start();
+                return true;
+            case R.id.sceneOC:
+                Log.d("MENU", "selected Eye_Restart");
+                new Thread(() -> {
+                    Connection.getInstance().sendData("sceneOC#");
+                }).start();
+                return true;
+            case R.id.sceneIP:
+                Log.d("MENU", "selected Eye_Restart");
+                new Thread(() -> {
+                    Connection.getInstance().sendData("sceneIP#");
+                }).start();
+                return true;
+            case R.id.sceneHG:
+                Log.d("MENU", "selected Eye_Restart");
+                new Thread(() -> {
+                    Connection.getInstance().sendData("sceneHG#");
+                }).start();
+                return true;
+            case R.id.overlay:
+                Log.d("MENU", "selected Eye_Restart");
+                new Thread(() -> {
+                    Connection.getInstance().sendData("overlay#");
+                }).start();
+                return true;
+            case R.id.new_exp:
+                Log.d("MENU", "selected Eye_Restart");
+                new Thread(() -> {
+                    Connection.getInstance().sendData("new_exp#");
+                }).start();
+                return true;
+            case R.id.continue_exp:
+                Log.d("MENU", "selected Eye_Restart");
+                new Thread(() -> {
+                    Connection.getInstance().sendData("continue_exp#");
+                }).start();
+                return true;
+            case R.id.exit:
+                Log.d("MENU", "selected Eye_Restart");
+                new Thread(() -> {
+                    Connection.getInstance().sendData("exit#");
+                }).start();
+                return true;
+            case R.id.training:
+                Log.d("MENU", "selected Eye_Restart");
+                new Thread(() -> {
+                    Connection.getInstance().sendData("training#");
+                }).start();
+                return true;
 
             default:
                 return super.onOptionsItemSelected(item);

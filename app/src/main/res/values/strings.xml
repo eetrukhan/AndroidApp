@@ -22,4 +22,20 @@
     <string name="_switch">Switch</string>
     <string name="tracking_on">Tracking On</string>
     <string name="stop_tracking">Stop Tracking</string>
+    <string name="switch_scene">Switch scene</string>
+    <string name="articulated_hands">ARTICULATED HANDS</string>
+    <string name="eye_gaze">EYE GAZE</string>
+    <string name="gesture_type">GESTURE TYPE</string>
+    <string name="image_plane_pointing">IMAGE-PLANE POINTING</string>
+    <string name="oculus_quest">OCULUS QUEST</string>
+    <string name="head_gaze">HEAD GAZE</string>
+    <string name="show_hide_overlay">Show/Hide overlay</string>
+    <string name="switch_leap_offset">Switch Leap Offset</string>
+    <string name="manual">Manual</string>
+    <string name="default_offset">default</string>
+    <string name="exit_app">Exit App</string>
+    <string name="new_experiment">New Experiment</string>
+    <string name="continue_experiment">Continue Experiment</string>
+    <string name="training">Training</string>
+    <string name="throw_a_ball">Throw A Ball</string>
 </resources>

@@ -1,30 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
-        android:id="@+id/ABCD"
-        android:title="@string/switch_ABCD">
-        <!-- "file" submenu -->
-        <menu>
-            <item
-                android:id="@+id/scale_A"
-                android:title="@string/A" />
-            <item
-                android:id="@+id/scale_B"
-                android:title="@string/B" />
-            <item
-                android:id="@+id/scale_C"
-                android:title="@string/C" />
-            <item
-                android:id="@+id/scale_D"
-                android:title="@string/D" />
-            <item
-                android:id="@+id/scale_Train"
-                android:title="@string/Train" />
-        </menu>
-    </item>
-    <item
         android:id="@+id/Re_entry"
         android:title="@string/reentry" />
+
+    <item
+        android:id="@+id/overlay"
+        android:title="@string/show_hide_overlay" />
 
     <item
         android:id="@+id/Eye"
@@ -40,15 +22,82 @@
     </item>
 
     <item
+        android:id="@+id/scene"
+        android:title="@string/switch_scene">
+        <!-- "file" submenu -->
+        <menu>
+            <item
+                android:id="@+id/sceneAH"
+                android:title="@string/articulated_hands" />
+            <item
+                android:id="@+id/sceneEG"
+                android:title="@string/eye_gaze" />
+            <item
+                android:id="@+id/sceneGT"
+                android:title="@string/gesture_type" />
+            <item
+                android:id="@+id/sceneIP"
+                android:title="@string/image_plane_pointing" />
+            <item
+                android:id="@+id/sceneOC"
+                android:title="@string/oculus_quest" />
+            <item
+                android:id="@+id/sceneHG"
+                android:title="@string/head_gaze" />
+        </menu>
+    </item>
+
+    <item
         android:id="@+id/other"
         android:title="@string/Other">
         <menu>
             <item
                 android:id="@+id/AH_Referencing"
                 android:title="@string/ah_referencing" />
+
             <item
                 android:id="@+id/Re_generate"
                 android:title="@string/regenerate" />
+            <item
+                android:id="@+id/ABCD"
+                android:title="@string/switch_ABCD">
+                <!-- "file" submenu -->
+                <menu>
+                    <item
+                        android:id="@+id/scale_A"
+                        android:title="@string/A" />
+                    <item
+                        android:id="@+id/scale_B"
+                        android:title="@string/B" />
+                    <item
+                        android:id="@+id/scale_C"
+                        android:title="@string/C" />
+                    <item
+                        android:id="@+id/scale_D"
+                        android:title="@string/D" />
+                    <item
+                        android:id="@+id/scale_Train"
+                        android:title="@string/Train" />
+                </menu>
+            </item>
+            <item
+                android:id="@+id/throw_a_ball"
+                android:title="@string/throw_a_ball">
+                <menu>
+                    <item
+                        android:id="@+id/exit"
+                        android:title="@string/exit_app" />
+                    <item
+                        android:id="@+id/new_exp"
+                        android:title="@string/new_experiment" />
+                    <item
+                        android:id="@+id/continue_exp"
+                        android:title="@string/continue_experiment" />
+                    <item
+                        android:id="@+id/training"
+                        android:title="@string/training" />
+                </menu>
+            </item>
         </menu>
     </item>
 
