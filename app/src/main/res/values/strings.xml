@@ -37,5 +37,10 @@
     <string name="new_experiment">New Experiment</string>
     <string name="continue_experiment">Continue Experiment</string>
     <string name="training">Training</string>
+    <string name="main_menu">Go to Main Menu</string>
+    <string name="max5">Set sentences 5</string>
+    <string name="max8">Set sentences 8</string>
+
+
     <string name="throw_a_ball">Throw A Ball</string>
 </resources>

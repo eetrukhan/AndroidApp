@@ -44,6 +44,9 @@
             <item
                 android:id="@+id/sceneHG"
                 android:title="@string/head_gaze" />
+            <item
+                android:id="@+id/sceneMainMenu"
+                android:title="@string/main_menu" />
         </menu>
     </item>
 
@@ -98,6 +101,12 @@
                         android:title="@string/training" />
                 </menu>
             </item>
+            <item
+                android:id="@+id/sentences_max5"
+                android:title="@string/max5" />
+                <item
+                android:id="@+id/sentences_max8"
+                android:title="@string/max8" />
         </menu>
     </item>
 

@@ -242,6 +242,27 @@ public class MainActivity extends AppCompatActivity implements KeyboardHeightObs
                 }).start();
                 return true;
 
+            case R.id.sentences_max8:
+                    Log.d("MENU", "sentences_max8");
+                    new Thread(() -> {
+                        Connection.getInstance().sendData("sentences_max5#");
+                    }).start();
+                    return true;
+
+            case R.id.sentences_max5:
+                Log.d("MENU", "sentences_max5");
+                new Thread(() -> {
+                    Connection.getInstance().sendData("sentences_max5#");
+                }).start();
+                return true;  
+
+            case R.id.sceneMainMenu:
+                Log.d("MENU", "sentences_max5");
+                new Thread(() -> {
+                    Connection.getInstance().sendData("load_menu#");
+                }).start();
+                return true;       
+
             default:
                 return super.onOptionsItemSelected(item);
         }
