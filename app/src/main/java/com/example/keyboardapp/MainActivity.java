@@ -245,7 +245,7 @@ public class MainActivity extends AppCompatActivity implements KeyboardHeightObs
             case R.id.sentences_max8:
                     Log.d("MENU", "sentences_max8");
                     new Thread(() -> {
-                        Connection.getInstance().sendData("sentences_max5#");
+                        Connection.getInstance().sendData("sentences_max8#");
                     }).start();
                     return true;
 
